@@ -34,6 +34,7 @@ const FormFieldComponent: React.FC<FormFieldProps> = ({ control, className, test
           const newValue = isCheckbox
             ? e
             : ((e as { target?: { value?: unknown } })?.target?.value ?? e);
+          console.log('FormField onChange:', componentProps.label, 'new value:', newValue);
           control.setValue(newValue);
         }}
         onBlur={() => {

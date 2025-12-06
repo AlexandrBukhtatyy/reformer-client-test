@@ -1,12 +1,8 @@
 /**
  * Валидация формы заявки на кредит
- * Использует @reformer/core/validators
- *
- * ValidationSchemaFn<T> = (path: FieldPath<T>) => void
- * - path содержит типизированные пути к полям формы
- * - функции вызываются внутри, не возвращают массив
  */
 
+import type { ValidationSchemaFn, FieldPath } from '@reformer/core';
 import {
   required,
   min,
@@ -14,177 +10,71 @@ import {
   minLength,
   maxLength,
   email,
+  validate,
   applyWhen,
-  validateTree,
-  notEmpty,
   validateItems,
 } from '@reformer/core/validators';
-import type { ValidationSchemaFn } from '@reformer/core';
-import type { CreditApplicationForm, Property, ExistingLoan, CoBorrower } from './types';
-import {
-  LOAN_AMOUNT_MIN,
-  LOAN_AMOUNT_MAX,
-  LOAN_TERM_MIN,
-  LOAN_TERM_MAX,
-  PROPERTY_VALUE_MIN,
-  CAR_PRICE_MIN,
-  CAR_PRICE_MAX,
-  CAR_YEAR_MIN,
-  CAR_YEAR_MAX,
-  MONTHLY_INCOME_MIN,
-  DEPENDENTS_MAX,
-  AGE_MIN,
-  AGE_MAX,
-  PAYMENT_TO_INCOME_RATIO_MAX,
-} from './constants';
+
+import type {
+  CreditApplicationForm,
+  Address,
+  PersonalData,
+  PassportData,
+  Property,
+  ExistingLoan,
+  CoBorrower,
+} from './types';
+
+import { LOAN_LIMITS, CAR_LIMITS, AGE_LIMITS, VALIDATION_LIMITS } from './constants';
 
 // ============================================================================
-// Шаг 1: Информация о кредите
+// Вспомогательные валидаторы для вложенных структур
 // ============================================================================
 
-export const step1Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
-  required(path.loanType, { message: 'Выберите тип кредита' });
-  required(path.loanAmount, { message: 'Укажите сумму кредита' });
-  min(path.loanAmount, LOAN_AMOUNT_MIN, { message: `Минимальная сумма ${LOAN_AMOUNT_MIN.toLocaleString('ru-RU')} ₽` });
-  max(path.loanAmount, LOAN_AMOUNT_MAX, { message: `Максимальная сумма ${LOAN_AMOUNT_MAX.toLocaleString('ru-RU')} ₽` });
-  required(path.loanTerm, { message: 'Укажите срок кредита' });
-  min(path.loanTerm, LOAN_TERM_MIN, { message: `Минимальный срок ${LOAN_TERM_MIN} месяцев` });
-  max(path.loanTerm, LOAN_TERM_MAX, { message: `Максимальный срок ${LOAN_TERM_MAX} месяцев` });
-  required(path.loanPurpose, { message: 'Укажите цель кредита' });
-  minLength(path.loanPurpose, 10, { message: 'Минимум 10 символов' });
-  maxLength(path.loanPurpose, 500, { message: 'Максимум 500 символов' });
-
-  // Условные поля для ипотеки
-  applyWhen(path.loanType, (value) => value === 'mortgage', (p) => {
-    required(p.propertyValue, { message: 'Укажите стоимость недвижимости' });
-    min(p.propertyValue, PROPERTY_VALUE_MIN, { message: `Минимальная стоимость ${PROPERTY_VALUE_MIN.toLocaleString('ru-RU')} ₽` });
-  });
-
-  // Условные поля для автокредита
-  applyWhen(path.loanType, (value) => value === 'car', (p) => {
-    required(p.carBrand, { message: 'Укажите марку автомобиля' });
-    minLength(p.carBrand, 2, { message: 'Минимум 2 символа' });
-    maxLength(p.carBrand, 50, { message: 'Максимум 50 символов' });
-    required(p.carModel, { message: 'Укажите модель автомобиля' });
-    minLength(p.carModel, 1, { message: 'Минимум 1 символ' });
-    maxLength(p.carModel, 50, { message: 'Максимум 50 символов' });
-    required(p.carYear, { message: 'Укажите год выпуска' });
-    min(p.carYear, CAR_YEAR_MIN, { message: `Минимальный год ${CAR_YEAR_MIN}` });
-    max(p.carYear, CAR_YEAR_MAX, { message: `Максимальный год ${CAR_YEAR_MAX}` });
-    required(p.carPrice, { message: 'Укажите стоимость автомобиля' });
-    min(p.carPrice, CAR_PRICE_MIN, { message: `Минимальная стоимость ${CAR_PRICE_MIN.toLocaleString('ru-RU')} ₽` });
-    max(p.carPrice, CAR_PRICE_MAX, { message: `Максимальная стоимость ${CAR_PRICE_MAX.toLocaleString('ru-RU')} ₽` });
-  });
+/** Валидация адреса */
+const validateAddress = (path: FieldPath<Address>) => {
+  required(path.region, { message: 'Укажите регион' });
+  required(path.city, { message: 'Укажите город' });
+  required(path.street, { message: 'Укажите улицу' });
+  required(path.house, { message: 'Укажите номер дома' });
+  required(path.postalCode, { message: 'Укажите индекс' });
+  minLength(path.postalCode, 6, { message: 'Индекс должен содержать 6 цифр' });
 };
 
-// ============================================================================
-// Шаг 2: Персональные данные
-// ============================================================================
-
-export const step2Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
-  // Персональные данные
-  required(path.personalData.lastName, { message: 'Введите фамилию' });
-  required(path.personalData.firstName, { message: 'Введите имя' });
-  required(path.personalData.middleName, { message: 'Введите отчество' });
-  required(path.personalData.birthDate, { message: 'Укажите дату рождения' });
-  required(path.personalData.gender, { message: 'Выберите пол' });
-  required(path.personalData.birthPlace, { message: 'Укажите место рождения' });
-
-  // Паспортные данные
-  required(path.passportData.series, { message: 'Введите серию паспорта' });
-  required(path.passportData.number, { message: 'Введите номер паспорта' });
-  required(path.passportData.issueDate, { message: 'Укажите дату выдачи' });
-  required(path.passportData.issuedBy, { message: 'Укажите кем выдан' });
-  required(path.passportData.departmentCode, { message: 'Укажите код подразделения' });
-
-  // Документы
-  required(path.inn, { message: 'Введите ИНН' });
-  required(path.snils, { message: 'Введите СНИЛС' });
+/** Валидация персональных данных */
+const validatePersonalData = (path: FieldPath<PersonalData>) => {
+  required(path.lastName, { message: 'Укажите фамилию' });
+  required(path.firstName, { message: 'Укажите имя' });
+  required(path.middleName, { message: 'Укажите отчество' });
+  required(path.birthDate, { message: 'Укажите дату рождения' });
+  required(path.gender, { message: 'Укажите пол' });
+  required(path.birthPlace, { message: 'Укажите место рождения' });
 };
 
-// ============================================================================
-// Шаг 3: Контактная информация
-// ============================================================================
-
-export const step3Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
-  // Телефоны
-  required(path.phoneMain, { message: 'Введите основной телефон' });
-
-  // Email
-  required(path.email, { message: 'Введите email' });
-  email(path.email, { message: 'Некорректный формат email' });
-
-  // Адрес регистрации
-  required(path.registrationAddress.region, { message: 'Введите регион' });
-  required(path.registrationAddress.city, { message: 'Введите город' });
-  required(path.registrationAddress.street, { message: 'Введите улицу' });
-  required(path.registrationAddress.house, { message: 'Введите номер дома' });
-  required(path.registrationAddress.postalCode, { message: 'Введите индекс' });
-
-  // Условный адрес проживания
-  applyWhen(path.sameAsRegistration, (value) => value === false, (p) => {
-    required(p.residenceAddress.region, { message: 'Введите регион' });
-    required(p.residenceAddress.city, { message: 'Введите город' });
-    required(p.residenceAddress.street, { message: 'Введите улицу' });
-    required(p.residenceAddress.house, { message: 'Введите номер дома' });
-    required(p.residenceAddress.postalCode, { message: 'Введите индекс' });
-  });
+/** Валидация паспортных данных */
+const validatePassportData = (path: FieldPath<PassportData>) => {
+  required(path.series, { message: 'Укажите серию паспорта' });
+  minLength(path.series, 5, { message: 'Серия паспорта должна содержать 4 цифры' });
+  required(path.number, { message: 'Укажите номер паспорта' });
+  minLength(path.number, 6, { message: 'Номер паспорта должен содержать 6 цифр' });
+  required(path.issueDate, { message: 'Укажите дату выдачи' });
+  required(path.issuedBy, { message: 'Укажите кем выдан паспорт' });
+  required(path.departmentCode, { message: 'Укажите код подразделения' });
+  minLength(path.departmentCode, 7, { message: 'Код подразделения должен быть в формате 123-456' });
 };
 
-// ============================================================================
-// Шаг 4: Информация о занятости
-// ============================================================================
-
-export const step4Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
-  required(path.employmentStatus, { message: 'Выберите статус занятости' });
-
-  // Условные поля для работающих по найму
-  applyWhen(path.employmentStatus, (value) => value === 'employed', (p) => {
-    required(p.companyName, { message: 'Введите название компании' });
-    required(p.companyAddress, { message: 'Введите адрес компании' });
-    required(p.position, { message: 'Введите должность' });
-  });
-
-  // Условные поля для ИП
-  applyWhen(path.employmentStatus, (value) => value === 'selfEmployed', (p) => {
-    required(p.businessType, { message: 'Введите тип бизнеса' });
-    required(p.businessInn, { message: 'Введите ИНН ИП' });
-  });
-
-  // Стаж - для всех работающих
-  applyWhen(path.employmentStatus, (value) => value === 'employed' || value === 'selfEmployed', (p) => {
-    required(p.workExperienceTotal, { message: 'Укажите общий стаж' });
-    min(p.workExperienceTotal, 0, { message: 'Стаж не может быть отрицательным' });
-    required(p.workExperienceCurrent, { message: 'Укажите стаж на текущем месте' });
-    min(p.workExperienceCurrent, 0, { message: 'Стаж не может быть отрицательным' });
-  });
-
-  // Доход
-  required(path.monthlyIncome, { message: 'Укажите ежемесячный доход' });
-  min(path.monthlyIncome, MONTHLY_INCOME_MIN, { message: `Минимальный доход ${MONTHLY_INCOME_MIN.toLocaleString('ru-RU')} ₽` });
-
-  // Условный источник дополнительного дохода
-  applyWhen(path.additionalIncome, (value) => value !== undefined && value > 0, (p) => {
-    required(p.additionalIncomeSource, { message: 'Укажите источник дополнительного дохода' });
-  });
-};
-
-// ============================================================================
-// Шаг 5: Дополнительная информация
-// ============================================================================
-
-// Валидация элемента имущества
-const propertyItemValidation: ValidationSchemaFn<Property> = (path) => {
-  required(path.type, { message: 'Выберите тип имущества' });
-  required(path.description, { message: 'Введите описание' });
+/** Валидация имущества */
+const validateProperty = (path: FieldPath<Property>) => {
+  required(path.type, { message: 'Укажите тип имущества' });
+  required(path.description, { message: 'Опишите имущество' });
   required(path.estimatedValue, { message: 'Укажите оценочную стоимость' });
   min(path.estimatedValue, 0, { message: 'Стоимость не может быть отрицательной' });
 };
 
-// Валидация элемента существующего кредита
-const existingLoanItemValidation: ValidationSchemaFn<ExistingLoan> = (path) => {
-  required(path.bank, { message: 'Введите название банка' });
-  required(path.type, { message: 'Введите тип кредита' });
+/** Валидация существующего кредита */
+const validateExistingLoan = (path: FieldPath<ExistingLoan>) => {
+  required(path.bank, { message: 'Укажите банк' });
+  required(path.type, { message: 'Укажите тип кредита' });
   required(path.amount, { message: 'Укажите сумму кредита' });
   min(path.amount, 0, { message: 'Сумма не может быть отрицательной' });
   required(path.remainingAmount, { message: 'Укажите остаток задолженности' });
@@ -192,153 +82,307 @@ const existingLoanItemValidation: ValidationSchemaFn<ExistingLoan> = (path) => {
   required(path.monthlyPayment, { message: 'Укажите ежемесячный платеж' });
   min(path.monthlyPayment, 0, { message: 'Платеж не может быть отрицательным' });
   required(path.maturityDate, { message: 'Укажите дату погашения' });
+
+  // Кросс-валидация: остаток не больше суммы кредита
+  validate(path.remainingAmount, (value, ctx) => {
+    const amount = ctx.getFieldValue('amount') as number | undefined;
+    if (value !== undefined && amount !== undefined && value > amount) {
+      return { code: 'remainingExceedsAmount', message: 'Остаток не может превышать сумму кредита' };
+    }
+    return null;
+  });
 };
 
-// Валидация элемента созаемщика
-const coBorrowerItemValidation: ValidationSchemaFn<CoBorrower> = (path) => {
-  required(path.personalData.lastName, { message: 'Введите фамилию созаемщика' });
-  required(path.personalData.firstName, { message: 'Введите имя созаемщика' });
-  required(path.personalData.birthDate, { message: 'Укажите дату рождения созаемщика' });
-  required(path.phone, { message: 'Введите телефон созаемщика' });
-  required(path.email, { message: 'Введите email созаемщика' });
-  email(path.email, { message: 'Некорректный формат email' });
+/** Валидация созаемщика */
+const validateCoBorrower = (path: FieldPath<CoBorrower>) => {
+  validatePersonalData(path.personalData);
+  required(path.phone, { message: 'Укажите телефон созаемщика' });
+  minLength(path.phone, 18, { message: 'Введите полный номер телефона' });
+  required(path.email, { message: 'Укажите email созаемщика' });
+  email(path.email, { message: 'Введите корректный email' });
   required(path.relationship, { message: 'Укажите родство' });
   required(path.monthlyIncome, { message: 'Укажите доход созаемщика' });
   min(path.monthlyIncome, 0, { message: 'Доход не может быть отрицательным' });
 };
 
-export const step5Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
-  required(path.maritalStatus, { message: 'Выберите семейное положение' });
-  required(path.dependents, { message: 'Укажите количество иждивенцев' });
-  min(path.dependents, 0, { message: 'Количество не может быть отрицательным' });
-  max(path.dependents, DEPENDENTS_MAX, { message: `Максимум ${DEPENDENTS_MAX} иждивенцев` });
-  required(path.education, { message: 'Выберите уровень образования' });
+// ============================================================================
+// Валидация по шагам
+// ============================================================================
 
-  // Валидация массива имущества
-  applyWhen(path.hasProperty, (value) => value === true, (p) => {
-    notEmpty(p.properties, { message: 'Добавьте хотя бы один объект имущества' });
-    validateItems(p.properties, propertyItemValidation);
+/** Шаг 1: Информация о кредите */
+export const step1Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
+  required(path.loanType, { message: 'Выберите тип кредита' });
+  required(path.loanAmount, { message: 'Укажите сумму кредита' });
+  min(path.loanAmount, LOAN_LIMITS.minAmount, {
+    message: `Минимальная сумма кредита ${LOAN_LIMITS.minAmount.toLocaleString()} ₽`,
   });
-
-  // Валидация массива кредитов
-  applyWhen(path.hasExistingLoans, (value) => value === true, (p) => {
-    notEmpty(p.existingLoans, { message: 'Добавьте хотя бы один кредит' });
-    validateItems(p.existingLoans, existingLoanItemValidation);
+  max(path.loanAmount, LOAN_LIMITS.maxAmount, {
+    message: `Максимальная сумма кредита ${LOAN_LIMITS.maxAmount.toLocaleString()} ₽`,
   });
+  required(path.loanTerm, { message: 'Укажите срок кредита' });
+  min(path.loanTerm, LOAN_LIMITS.minTerm, { message: `Минимальный срок ${LOAN_LIMITS.minTerm} месяцев` });
+  max(path.loanTerm, LOAN_LIMITS.maxTerm, { message: `Максимальный срок ${LOAN_LIMITS.maxTerm} месяцев` });
+  required(path.loanPurpose, { message: 'Укажите цель кредита' });
+  minLength(path.loanPurpose, 10, { message: 'Описание цели должно содержать минимум 10 символов' });
+  maxLength(path.loanPurpose, 500, { message: 'Описание цели не должно превышать 500 символов' });
 
-  // Валидация массива созаемщиков
-  applyWhen(path.hasCoBorrower, (value) => value === true, (p) => {
-    notEmpty(p.coBorrowers, { message: 'Добавьте хотя бы одного созаемщика' });
-    validateItems(p.coBorrowers, coBorrowerItemValidation);
+  // Условная валидация для ипотеки
+  applyWhen(
+    path.loanType,
+    (loanType) => loanType === 'mortgage',
+    (p) => {
+      required(p.propertyValue, { message: 'Укажите стоимость недвижимости' });
+      min(p.propertyValue, 1000000, { message: 'Минимальная стоимость недвижимости 1 000 000 ₽' });
+      required(p.initialPayment, { message: 'Укажите первоначальный взнос' });
+
+      // Кросс-валидация: первоначальный взнос минимум 20% от стоимости
+      validate(p.initialPayment, (value, ctx) => {
+        const propertyValue = ctx.getFieldValue('propertyValue') as number | undefined;
+        if (propertyValue && value !== undefined) {
+          const minPayment = propertyValue * 0.2;
+          if (value < minPayment) {
+            return {
+              code: 'insufficientDownPayment',
+              message: `Первоначальный взнос должен быть минимум ${minPayment.toLocaleString()} ₽ (20% от стоимости)`,
+            };
+          }
+        }
+        return null;
+      });
+
+      // Кросс-валидация: сумма кредита не превышает (стоимость - первоначальный взнос)
+      validate(p.loanAmount, (value, ctx) => {
+        const propertyValue = ctx.getFieldValue('propertyValue') as number | undefined;
+        const initialPayment = ctx.getFieldValue('initialPayment') as number | undefined;
+        if (propertyValue && initialPayment && value !== undefined) {
+          const maxLoan = propertyValue - initialPayment;
+          if (value > maxLoan) {
+            return {
+              code: 'loanExceedsProperty',
+              message: `Сумма кредита не может превышать ${maxLoan.toLocaleString()} ₽`,
+            };
+          }
+        }
+        return null;
+      });
+    }
+  );
+
+  // Условная валидация для автокредита
+  applyWhen(
+    path.loanType,
+    (loanType) => loanType === 'car',
+    (p) => {
+      required(p.carBrand, { message: 'Укажите марку автомобиля' });
+      minLength(p.carBrand, 2, { message: 'Марка должна содержать минимум 2 символа' });
+      required(p.carModel, { message: 'Укажите модель автомобиля' });
+      minLength(p.carModel, 1, { message: 'Укажите модель' });
+      required(p.carYear, { message: 'Укажите год выпуска' });
+      min(p.carYear, CAR_LIMITS.minYear, { message: `Минимальный год выпуска ${CAR_LIMITS.minYear}` });
+      max(p.carYear, CAR_LIMITS.maxYear, { message: `Максимальный год выпуска ${CAR_LIMITS.maxYear}` });
+      required(p.carPrice, { message: 'Укажите стоимость автомобиля' });
+      min(p.carPrice, CAR_LIMITS.minPrice, {
+        message: `Минимальная стоимость ${CAR_LIMITS.minPrice.toLocaleString()} ₽`,
+      });
+      max(p.carPrice, CAR_LIMITS.maxPrice, {
+        message: `Максимальная стоимость ${CAR_LIMITS.maxPrice.toLocaleString()} ₽`,
+      });
+    }
+  );
+};
+
+/** Шаг 2: Персональные данные */
+export const step2Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
+  validatePersonalData(path.personalData);
+  validatePassportData(path.passportData);
+
+  required(path.inn, { message: 'Укажите ИНН' });
+  minLength(path.inn, 12, { message: 'ИНН должен содержать 12 цифр' });
+  required(path.snils, { message: 'Укажите СНИЛС' });
+  minLength(path.snils, 14, { message: 'СНИЛС должен быть в формате 123-456-789 00' });
+
+  // Кросс-валидация: возраст от 18 до 70 лет
+  validate(path.age, (value) => {
+    if (value !== undefined) {
+      if (value < AGE_LIMITS.minAge) {
+        return { code: 'tooYoung', message: `Минимальный возраст заемщика ${AGE_LIMITS.minAge} лет` };
+      }
+      if (value > AGE_LIMITS.maxAge) {
+        return { code: 'tooOld', message: `Максимальный возраст заемщика ${AGE_LIMITS.maxAge} лет` };
+      }
+    }
+    return null;
   });
 };
 
-// ============================================================================
-// Шаг 6: Согласия и подтверждение
-// ============================================================================
+/** Шаг 3: Контактная информация */
+export const step3Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
+  required(path.phoneMain, { message: 'Укажите основной телефон' });
+  minLength(path.phoneMain, 18, { message: 'Введите полный номер телефона' });
+  required(path.email, { message: 'Укажите email' });
+  email(path.email, { message: 'Введите корректный email' });
 
-export const step6Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
-  required(path.agreePersonalData, { message: 'Необходимо согласие на обработку персональных данных' });
-  required(path.agreeCreditHistory, { message: 'Необходимо согласие на проверку кредитной истории' });
-  required(path.agreeTerms, { message: 'Необходимо согласие с условиями кредитования' });
-  required(path.confirmAccuracy, { message: 'Необходимо подтверждение точности данных' });
-  required(path.electronicSignature, { message: 'Введите код из СМС' });
+  // Валидация адреса регистрации
+  validateAddress(path.registrationAddress);
+
+  // Условная валидация адреса проживания
+  applyWhen(
+    path.sameAsRegistration,
+    (sameAsRegistration) => sameAsRegistration === false,
+    (p) => {
+      validateAddress(p.residenceAddress);
+    }
+  );
 };
 
-// ============================================================================
-// Кросс-валидации
-// ============================================================================
+/** Шаг 4: Занятость и доход */
+export const step4Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
+  required(path.employmentStatus, { message: 'Укажите статус занятости' });
 
-export const crossFieldValidation: ValidationSchemaFn<CreditApplicationForm> = () => {
-  // Стаж на текущем месте не может быть больше общего стажа
-  validateTree((ctx) => {
-    const form = ctx.form.getValue();
-    if (
-      form.workExperienceCurrent !== undefined &&
-      form.workExperienceTotal !== undefined &&
-      form.workExperienceCurrent > form.workExperienceTotal
-    ) {
+  // Условная валидация для работающих по найму
+  applyWhen(
+    path.employmentStatus,
+    (status) => status === 'employed',
+    (p) => {
+      required(p.companyName, { message: 'Укажите название компании' });
+      required(p.companyInn, { message: 'Укажите ИНН компании' });
+      minLength(p.companyInn, 10, { message: 'ИНН компании должен содержать 10 цифр' });
+      required(p.position, { message: 'Укажите должность' });
+    }
+  );
+
+  // Условная валидация для ИП
+  applyWhen(
+    path.employmentStatus,
+    (status) => status === 'selfEmployed',
+    (p) => {
+      required(p.businessType, { message: 'Укажите тип бизнеса' });
+      required(p.businessInn, { message: 'Укажите ИНН ИП' });
+      minLength(p.businessInn, 12, { message: 'ИНН ИП должен содержать 12 цифр' });
+    }
+  );
+
+  required(path.workExperienceTotal, { message: 'Укажите общий стаж работы' });
+  min(path.workExperienceTotal, 0, { message: 'Стаж не может быть отрицательным' });
+  required(path.workExperienceCurrent, { message: 'Укажите стаж на текущем месте' });
+  min(path.workExperienceCurrent, 0, { message: 'Стаж не может быть отрицательным' });
+
+  // Кросс-валидация: стаж на текущем месте не больше общего стажа
+  validate(path.workExperienceCurrent, (value, ctx) => {
+    const total = ctx.getFieldValue('workExperienceTotal') as number | undefined;
+    if (value !== undefined && total !== undefined && value > total) {
       return {
-        code: 'workExperienceInvalid',
+        code: 'currentExceedsTotal',
         message: 'Стаж на текущем месте не может быть больше общего стажа',
       };
     }
     return null;
-  }, { targetField: 'workExperienceCurrent' });
+  });
 
-  // Первоначальный взнос должен быть минимум 20% от стоимости недвижимости
-  validateTree((ctx) => {
-    const form = ctx.form.getValue();
-    if (
-      form.loanType === 'mortgage' &&
-      form.propertyValue !== undefined &&
-      form.initialPayment !== undefined &&
-      form.initialPayment < form.propertyValue * 0.2
-    ) {
-      return {
-        code: 'initialPaymentTooLow',
-        message: 'Первоначальный взнос должен быть минимум 20% от стоимости недвижимости',
-      };
+  required(path.monthlyIncome, { message: 'Укажите ежемесячный доход' });
+  min(path.monthlyIncome, 10000, { message: 'Минимальный доход 10 000 ₽' });
+
+  // Условная валидация: источник дополнительного дохода обязателен при наличии дохода
+  applyWhen(
+    path.additionalIncome,
+    (income) => income !== undefined && income > 0,
+    (p) => {
+      required(p.additionalIncomeSource, { message: 'Укажите источник дополнительного дохода' });
     }
-    return null;
-  }, { targetField: 'initialPayment' });
+  );
 
-  // Проверка возраста (18-70 лет)
-  validateTree((ctx) => {
-    const form = ctx.form.getValue();
-    if (form.age !== undefined) {
-      if (form.age < AGE_MIN) {
-        return {
-          code: 'ageTooYoung',
-          message: `Возраст должен быть не менее ${AGE_MIN} лет`,
-        };
-      }
-      if (form.age > AGE_MAX) {
-        return {
-          code: 'ageTooOld',
-          message: `Возраст должен быть не более ${AGE_MAX} лет`,
-        };
-      }
-    }
-    return null;
-  }, { targetField: 'personalData.birthDate' });
-
-  // Платеж не должен превышать 50% от дохода
-  validateTree((ctx) => {
-    const form = ctx.form.getValue();
-    if (
-      form.paymentToIncomeRatio !== undefined &&
-      form.paymentToIncomeRatio > PAYMENT_TO_INCOME_RATIO_MAX
-    ) {
+  // Кросс-валидация: платеж к доходу не более 50%
+  validate(path.paymentToIncomeRatio, (value) => {
+    if (value !== undefined && value > VALIDATION_LIMITS.maxPaymentToIncomeRatio) {
       return {
         code: 'paymentTooHigh',
-        message: `Ежемесячный платеж не должен превышать ${PAYMENT_TO_INCOME_RATIO_MAX}% от дохода`,
+        message: `Ежемесячный платеж не должен превышать ${VALIDATION_LIMITS.maxPaymentToIncomeRatio}% от дохода`,
       };
     }
     return null;
-  }, { targetField: 'loanAmount' });
+  });
+};
 
-  // Сумма ипотечного кредита не может превышать (стоимость - первоначальный взнос)
-  validateTree((ctx) => {
-    const form = ctx.form.getValue();
-    if (
-      form.loanType === 'mortgage' &&
-      form.loanAmount !== undefined &&
-      form.propertyValue !== undefined &&
-      form.initialPayment !== undefined &&
-      form.loanAmount > form.propertyValue - form.initialPayment
-    ) {
-      return {
-        code: 'loanAmountTooHigh',
-        message: 'Сумма кредита не может превышать стоимость недвижимости за вычетом первоначального взноса',
-      };
+/** Шаг 5: Дополнительная информация */
+export const step5Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
+  required(path.maritalStatus, { message: 'Укажите семейное положение' });
+  required(path.dependents, { message: 'Укажите количество иждивенцев' });
+  min(path.dependents, 0, { message: 'Количество не может быть отрицательным' });
+  max(path.dependents, VALIDATION_LIMITS.maxDependents, {
+    message: `Максимальное количество иждивенцев ${VALIDATION_LIMITS.maxDependents}`,
+  });
+  required(path.education, { message: 'Укажите уровень образования' });
+
+  // Валидация массива имущества
+  applyWhen(
+    path.hasProperty,
+    (hasProperty) => hasProperty === true,
+    (p) => {
+      validateItems(p.properties, (itemPath) => {
+        validateProperty(itemPath);
+      });
+    }
+  );
+
+  // Валидация массива существующих кредитов
+  applyWhen(
+    path.hasExistingLoans,
+    (hasExistingLoans) => hasExistingLoans === true,
+    (p) => {
+      validateItems(p.existingLoans, (itemPath) => {
+        validateExistingLoan(itemPath);
+      });
+    }
+  );
+
+  // Валидация массива созаемщиков
+  applyWhen(
+    path.hasCoBorrower,
+    (hasCoBorrower) => hasCoBorrower === true,
+    (p) => {
+      validateItems(p.coBorrowers, (itemPath) => {
+        validateCoBorrower(itemPath);
+      });
+    }
+  );
+};
+
+/** Шаг 6: Подтверждение */
+export const step6Validation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
+  validate(path.agreePersonalData, (value) => {
+    if (!value) {
+      return { code: 'required', message: 'Необходимо согласие на обработку персональных данных' };
     }
     return null;
-  }, { targetField: 'loanAmount' });
+  });
+
+  validate(path.agreeCreditHistory, (value) => {
+    if (!value) {
+      return { code: 'required', message: 'Необходимо согласие на проверку кредитной истории' };
+    }
+    return null;
+  });
+
+  validate(path.agreeTerms, (value) => {
+    if (!value) {
+      return { code: 'required', message: 'Необходимо согласие с условиями кредитования' };
+    }
+    return null;
+  });
+
+  validate(path.confirmAccuracy, (value) => {
+    if (!value) {
+      return { code: 'required', message: 'Необходимо подтвердить точность данных' };
+    }
+    return null;
+  });
+
+  required(path.electronicSignature, { message: 'Введите код подтверждения' });
+  minLength(path.electronicSignature, 6, { message: 'Код должен содержать 6 цифр' });
 };
 
 // ============================================================================
-// Полная валидация формы
+// Полная валидация
 // ============================================================================
 
 export const fullValidation: ValidationSchemaFn<CreditApplicationForm> = (path) => {
@@ -348,14 +392,13 @@ export const fullValidation: ValidationSchemaFn<CreditApplicationForm> = (path) 
   step4Validation(path);
   step5Validation(path);
   step6Validation(path);
-  crossFieldValidation(path);
 };
 
 // ============================================================================
-// Маппинг валидаций по шагам
+// Конфигурация валидации по шагам
 // ============================================================================
 
-export const stepValidations: Record<number, ValidationSchemaFn<CreditApplicationForm>> = {
+export const STEP_VALIDATIONS: Record<number, ValidationSchemaFn<CreditApplicationForm>> = {
   1: step1Validation,
   2: step2Validation,
   3: step3Validation,

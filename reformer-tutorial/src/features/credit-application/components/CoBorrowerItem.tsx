@@ -1,5 +1,5 @@
 /**
- * Компонент элемента массива - Созаемщик
+ * Компонент для отображения элемента созаемщика в массиве
  */
 
 import type { GroupNodeWithControls } from '@reformer/core';
@@ -9,24 +9,23 @@ import type { CoBorrower } from '../model/types';
 
 interface CoBorrowerItemProps {
   control: GroupNodeWithControls<CoBorrower>;
-  index: number;
 }
 
-export function CoBorrowerItem({ control, index }: CoBorrowerItemProps) {
+export function CoBorrowerItem({ control }: CoBorrowerItemProps) {
   return (
-    <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-      <h5 className="font-medium text-gray-700 mb-3">Созаемщик #{index + 1}</h5>
+    <div className="space-y-6">
+      <PersonalDataSubForm control={control.personalData} title="Персональные данные созаемщика" />
 
-      <PersonalDataSubForm
-        control={control.personalData}
-        title="Личные данные"
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <FormField control={control.phone} />
-        <FormField control={control.email} />
-        <FormField control={control.relationship} />
-        <FormField control={control.monthlyIncome} />
+      <div className="space-y-4">
+        <h4 className="font-medium text-gray-900">Контактная информация</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField control={control.phone} />
+          <FormField control={control.email} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField control={control.relationship} />
+          <FormField control={control.monthlyIncome} />
+        </div>
       </div>
     </div>
   );

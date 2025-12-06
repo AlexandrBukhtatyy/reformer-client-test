@@ -3,96 +3,101 @@
  */
 
 import type { GroupNodeWithControls } from '@reformer/core';
+import { useFormControlValue } from '@reformer/core';
 import { FormField } from '@/components/ui/FormField';
+import { Button } from '@/components/ui/button';
 import type { CreditApplicationForm } from '../model/types';
 
 interface Step6ConfirmationProps {
   control: GroupNodeWithControls<CreditApplicationForm>;
+  onSendSmsCode?: () => void;
+  isSendingSms?: boolean;
 }
 
-export function Step6Confirmation({ control }: Step6ConfirmationProps) {
+export function Step6Confirmation({ control, onSendSmsCode, isSendingSms }: Step6ConfirmationProps) {
+  const fullName = useFormControlValue(control.fullName);
+  const loanAmount = useFormControlValue(control.loanAmount);
+  const loanTerm = useFormControlValue(control.loanTerm);
+  const monthlyPayment = useFormControlValue(control.monthlyPayment);
+  const interestRate = useFormControlValue(control.interestRate);
+  const phoneMain = useFormControlValue(control.phoneMain);
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-800">Шаг 6: Подтверждение заявки</h2>
+      {/* Сводка заявки */}
+      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <h4 className="font-medium text-blue-900 mb-4">Сводка по заявке</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="text-gray-600">Заемщик:</span>
+            <span className="ml-2 font-medium text-gray-900">{fullName || '—'}</span>
+          </div>
+          <div>
+            <span className="text-gray-600">Сумма кредита:</span>
+            <span className="ml-2 font-medium text-gray-900">
+              {loanAmount ? `${loanAmount.toLocaleString()} ₽` : '—'}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-600">Срок кредита:</span>
+            <span className="ml-2 font-medium text-gray-900">
+              {loanTerm ? `${loanTerm} мес.` : '—'}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-600">Процентная ставка:</span>
+            <span className="ml-2 font-medium text-gray-900">
+              {interestRate ? `${interestRate}%` : '—'}
+            </span>
+          </div>
+          <div className="md:col-span-2">
+            <span className="text-gray-600">Ежемесячный платеж:</span>
+            <span className="ml-2 font-medium text-green-600 text-lg">
+              {monthlyPayment ? `${monthlyPayment.toLocaleString()} ₽` : '—'}
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Согласия */}
-      <div className="p-4 bg-white rounded-lg border border-gray-200 space-y-4">
-        <h4 className="font-medium text-gray-700">Согласия</h4>
-
+      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <h4 className="font-medium text-gray-900 mb-4">Согласия</h4>
         <div className="space-y-3">
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <FormField control={control.agreePersonalData} />
-            <p className="text-xs text-gray-500 mt-1 ml-6">
-              Я даю согласие на обработку моих персональных данных в соответствии с
-              Федеральным законом № 152-ФЗ "О персональных данных".
-            </p>
-          </div>
-
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <FormField control={control.agreeCreditHistory} />
-            <p className="text-xs text-gray-500 mt-1 ml-6">
-              Я даю согласие на получение кредитного отчета из бюро кредитных историй.
-            </p>
-          </div>
-
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <FormField control={control.agreeTerms} />
-            <p className="text-xs text-gray-500 mt-1 ml-6">
-              Я ознакомлен и согласен с общими условиями кредитования.
-            </p>
-          </div>
-
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <FormField control={control.agreeMarketing} />
-            <p className="text-xs text-gray-500 mt-1 ml-6">
-              Я согласен на получение рекламных и информационных материалов (необязательно).
-            </p>
-          </div>
+          <FormField control={control.agreePersonalData} />
+          <FormField control={control.agreeCreditHistory} />
+          <FormField control={control.agreeTerms} />
+          <FormField control={control.agreeMarketing} />
         </div>
       </div>
 
       {/* Подтверждение данных */}
-      <div className="p-4 bg-white rounded-lg border border-gray-200 space-y-4">
-        <h4 className="font-medium text-gray-700">Подтверждение</h4>
-
-        <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-          <FormField control={control.confirmAccuracy} />
-          <p className="text-xs text-amber-700 mt-1 ml-6">
-            Я подтверждаю, что все указанные мной сведения являются достоверными и полными.
-            Я осознаю, что предоставление недостоверной информации может повлечь отказ в
-            выдаче кредита или требование о досрочном погашении.
-          </p>
-        </div>
+      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <h4 className="font-medium text-gray-900 mb-4">Подтверждение</h4>
+        <FormField control={control.confirmAccuracy} />
       </div>
 
-      {/* SMS-код */}
-      <div className="p-4 bg-white rounded-lg border border-gray-200 space-y-4">
-        <h4 className="font-medium text-gray-700">Электронная подпись</h4>
-
-        <p className="text-sm text-gray-600">
-          Для подтверждения заявки введите код из SMS, отправленный на номер телефона,
-          указанный в заявке.
+      {/* СМС-код */}
+      <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+        <h4 className="font-medium text-yellow-900 mb-4">Подтверждение по СМС</h4>
+        <p className="text-sm text-yellow-800 mb-4">
+          Для завершения заявки введите код подтверждения, отправленный на номер {phoneMain || 'ваш телефон'}.
         </p>
-
-        <div className="max-w-xs">
-          <FormField control={control.electronicSignature} />
+        <div className="flex items-end gap-4">
+          <div className="flex-1">
+            <FormField control={control.electronicSignature} />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onSendSmsCode}
+            disabled={isSendingSms}
+          >
+            {isSendingSms ? 'Отправка...' : 'Отправить код'}
+          </Button>
         </div>
-
-        <p className="text-xs text-gray-500">
-          Введя код, вы подписываете заявку электронной подписью в соответствии
-          с Федеральным законом № 63-ФЗ "Об электронной подписи".
+        <p className="text-xs text-gray-500 mt-2">
+          Для тестирования используйте код: 123456
         </p>
-      </div>
-
-      {/* Информационный блок */}
-      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h4 className="font-medium text-blue-800 mb-2">Что дальше?</h4>
-        <ul className="text-sm text-blue-700 space-y-1">
-          <li>• После отправки заявки мы проверим указанные данные</li>
-          <li>• Решение по заявке будет принято в течение 15 минут</li>
-          <li>• Вы получите SMS-уведомление о результате рассмотрения</li>
-          <li>• При положительном решении менеджер свяжется с вами для согласования условий</li>
-        </ul>
       </div>
     </div>
   );
