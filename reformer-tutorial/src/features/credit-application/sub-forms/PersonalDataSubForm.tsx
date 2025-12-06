@@ -1,5 +1,5 @@
 /**
- * Под-форма персональных данных
+ * Под-форма для ввода персональных данных
  */
 
 import type { GroupNodeWithControls } from '@reformer/core';
@@ -14,20 +14,15 @@ interface PersonalDataSubFormProps {
 export function PersonalDataSubForm({ control, title }: PersonalDataSubFormProps) {
   return (
     <div className="space-y-4">
-      {title && <h4 className="font-medium text-gray-900">{title}</h4>}
-
+      {title && <h4 className="font-medium text-gray-700">{title}</h4>}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField control={control.lastName} />
         <FormField control={control.firstName} />
         <FormField control={control.middleName} />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField control={control.birthDate} />
-        <FormField control={control.gender} />
+        <FormField control={control.gender} className="md:col-span-2" />
+        <FormField control={control.birthPlace} className="md:col-span-3" />
       </div>
-
-      <FormField control={control.birthPlace} />
     </div>
   );
 }

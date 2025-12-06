@@ -1,5 +1,5 @@
 /**
- * Под-форма паспортных данных
+ * Под-форма для ввода паспортных данных
  */
 
 import type { GroupNodeWithControls } from '@reformer/core';
@@ -14,19 +14,14 @@ interface PassportDataSubFormProps {
 export function PassportDataSubForm({ control, title }: PassportDataSubFormProps) {
   return (
     <div className="space-y-4">
-      {title && <h4 className="font-medium text-gray-900">{title}</h4>}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {title && <h4 className="font-medium text-gray-700">{title}</h4>}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField control={control.series} />
         <FormField control={control.number} />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={control.issueDate} />
         <FormField control={control.departmentCode} />
+        <FormField control={control.issueDate} />
+        <FormField control={control.issuedBy} className="md:col-span-2" />
       </div>
-
-      <FormField control={control.issuedBy} />
     </div>
   );
 }

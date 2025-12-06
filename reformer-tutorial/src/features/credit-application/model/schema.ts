@@ -1,76 +1,48 @@
 /**
  * Схема формы заявки на кредит
+ * Использует @reformer/core для определения структуры формы
+ *
+ * FormSchema требует FieldConfig с value и component для каждого поля
  */
 
 import type { FormSchema } from '@reformer/core';
 import { Input } from '@/components/ui/input';
-import { InputMask } from '@/components/ui/input-mask';
+import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { RadioGroup } from '@/components/ui/radio-group';
-import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-
+import { InputMask } from '@/components/ui/input-mask';
 import type {
   CreditApplicationForm,
-  Address,
   PersonalData,
   PassportData,
+  Address,
   Property,
   ExistingLoan,
   CoBorrower,
 } from './types';
-
 import {
-  LOAN_TYPE_OPTIONS,
-  EMPLOYMENT_STATUS_OPTIONS,
-  MARITAL_STATUS_OPTIONS,
-  EDUCATION_OPTIONS,
+  LOAN_TYPES,
+  EMPLOYMENT_STATUSES,
+  MARITAL_STATUSES,
+  EDUCATION_LEVELS,
   GENDER_OPTIONS,
-  PROPERTY_TYPE_OPTIONS,
-  LOAN_LIMITS,
-  CAR_LIMITS,
+  PROPERTY_TYPES,
   MASKS,
+  LOAN_AMOUNT_MIN,
+  LOAN_AMOUNT_MAX,
+  LOAN_AMOUNT_STEP,
+  LOAN_TERM_MIN,
+  LOAN_TERM_MAX,
+  CAR_YEAR_MIN,
+  CAR_YEAR_MAX,
+  DEPENDENTS_MAX,
 } from './constants';
 
 // ============================================================================
-// Вложенные схемы
+// Под-схемы для переиспользуемых групп полей
 // ============================================================================
 
-/** Схема адреса */
-export const addressSchema: FormSchema<Address> = {
-  region: {
-    value: '',
-    component: Input,
-    componentProps: { label: 'Регион', placeholder: 'Введите регион' },
-  },
-  city: {
-    value: '',
-    component: Input,
-    componentProps: { label: 'Город', placeholder: 'Введите город' },
-  },
-  street: {
-    value: '',
-    component: Input,
-    componentProps: { label: 'Улица', placeholder: 'Введите улицу' },
-  },
-  house: {
-    value: '',
-    component: Input,
-    componentProps: { label: 'Дом', placeholder: '№' },
-  },
-  apartment: {
-    value: '',
-    component: Input,
-    componentProps: { label: 'Квартира', placeholder: '№' },
-  },
-  postalCode: {
-    value: '',
-    component: InputMask,
-    componentProps: { label: 'Индекс', mask: MASKS.postalCode, placeholder: '000000' },
-  },
-};
-
-/** Схема персональных данных */
 export const personalDataSchema: FormSchema<PersonalData> = {
   lastName: {
     value: '',
@@ -104,7 +76,6 @@ export const personalDataSchema: FormSchema<PersonalData> = {
   },
 };
 
-/** Схема паспортных данных */
 export const passportDataSchema: FormSchema<PassportData> = {
   series: {
     value: '',
@@ -133,12 +104,48 @@ export const passportDataSchema: FormSchema<PassportData> = {
   },
 };
 
-/** Схема имущества */
-export const propertySchema: FormSchema<Property> = {
+export const addressSchema: FormSchema<Address> = {
+  region: {
+    value: '',
+    component: Input,
+    componentProps: { label: 'Регион', placeholder: 'Введите регион' },
+  },
+  city: {
+    value: '',
+    component: Input,
+    componentProps: { label: 'Город', placeholder: 'Введите город' },
+  },
+  street: {
+    value: '',
+    component: Input,
+    componentProps: { label: 'Улица', placeholder: 'Введите улицу' },
+  },
+  house: {
+    value: '',
+    component: Input,
+    componentProps: { label: 'Дом', placeholder: '№' },
+  },
+  apartment: {
+    value: '',
+    component: Input,
+    componentProps: { label: 'Квартира', placeholder: '№' },
+  },
+  postalCode: {
+    value: '',
+    component: InputMask,
+    componentProps: { label: 'Индекс', mask: MASKS.postalCode, placeholder: '000000' },
+  },
+};
+
+// ============================================================================
+// Схемы для элементов массивов
+// ============================================================================
+
+export const propertyItemSchema: FormSchema<Property> = {
   type: {
     value: 'apartment',
     component: Select,
-    componentProps: { label: 'Тип имущества', options: PROPERTY_TYPE_OPTIONS },
+    componentProps: { label: 'Тип имущества', options: PROPERTY_TYPES, placeholder: 'Выберите тип' },
   },
   description: {
     value: '',
@@ -146,9 +153,9 @@ export const propertySchema: FormSchema<Property> = {
     componentProps: { label: 'Описание', placeholder: 'Опишите имущество', rows: 2 },
   },
   estimatedValue: {
-    value: undefined,
+    value: null,
     component: Input,
-    componentProps: { label: 'Оценочная стоимость (₽)', type: 'number', min: 0, placeholder: '0' },
+    componentProps: { label: 'Оценочная стоимость (₽)', type: 'number', placeholder: '0', min: 0 },
   },
   hasEncumbrance: {
     value: false,
@@ -157,8 +164,7 @@ export const propertySchema: FormSchema<Property> = {
   },
 };
 
-/** Схема существующего кредита */
-export const existingLoanSchema: FormSchema<ExistingLoan> = {
+export const existingLoanItemSchema: FormSchema<ExistingLoan> = {
   bank: {
     value: '',
     component: Input,
@@ -170,19 +176,19 @@ export const existingLoanSchema: FormSchema<ExistingLoan> = {
     componentProps: { label: 'Тип кредита', placeholder: 'Тип кредита' },
   },
   amount: {
-    value: undefined,
+    value: null,
     component: Input,
-    componentProps: { label: 'Сумма кредита (₽)', type: 'number', min: 0, placeholder: '0' },
+    componentProps: { label: 'Сумма кредита (₽)', type: 'number', placeholder: '0', min: 0 },
   },
   remainingAmount: {
-    value: undefined,
+    value: null,
     component: Input,
-    componentProps: { label: 'Остаток задолженности (₽)', type: 'number', min: 0, placeholder: '0' },
+    componentProps: { label: 'Остаток задолженности (₽)', type: 'number', placeholder: '0', min: 0 },
   },
   monthlyPayment: {
-    value: undefined,
+    value: null,
     component: Input,
-    componentProps: { label: 'Ежемесячный платеж (₽)', type: 'number', min: 0, placeholder: '0' },
+    componentProps: { label: 'Ежемесячный платеж (₽)', type: 'number', placeholder: '0', min: 0 },
   },
   maturityDate: {
     value: '',
@@ -191,8 +197,7 @@ export const existingLoanSchema: FormSchema<ExistingLoan> = {
   },
 };
 
-/** Схема созаемщика */
-export const coBorrowerSchema: FormSchema<CoBorrower> = {
+export const coBorrowerItemSchema: FormSchema<CoBorrower> = {
   personalData: personalDataSchema,
   phone: {
     value: '',
@@ -210,9 +215,9 @@ export const coBorrowerSchema: FormSchema<CoBorrower> = {
     componentProps: { label: 'Родство', placeholder: 'Укажите родство' },
   },
   monthlyIncome: {
-    value: undefined,
+    value: null,
     component: Input,
-    componentProps: { label: 'Ежемесячный доход (₽)', type: 'number', min: 0, placeholder: '0' },
+    componentProps: { label: 'Ежемесячный доход (₽)', type: 'number', placeholder: '0', min: 0 },
   },
 };
 
@@ -221,24 +226,24 @@ export const coBorrowerSchema: FormSchema<CoBorrower> = {
 // ============================================================================
 
 export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
-  // ============================================================================
-  // Шаг 1: Основная информация о кредите
-  // ============================================================================
+  // -------------------------------------------------------------------------
+  // Шаг 1: Информация о кредите
+  // -------------------------------------------------------------------------
   loanType: {
     value: 'consumer',
     component: Select,
-    componentProps: { label: 'Тип кредита', options: LOAN_TYPE_OPTIONS, placeholder: 'Выберите тип кредита' },
+    componentProps: { label: 'Тип кредита', options: LOAN_TYPES, placeholder: 'Выберите тип кредита' },
   },
   loanAmount: {
-    value: undefined,
+    value: null,
     component: Input,
     componentProps: {
       label: 'Сумма кредита (₽)',
       type: 'number',
-      min: LOAN_LIMITS.minAmount,
-      max: LOAN_LIMITS.maxAmount,
-      step: LOAN_LIMITS.amountStep,
       placeholder: 'Введите сумму',
+      min: LOAN_AMOUNT_MIN,
+      max: LOAN_AMOUNT_MAX,
+      step: LOAN_AMOUNT_STEP,
     },
   },
   loanTerm: {
@@ -247,9 +252,9 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
     componentProps: {
       label: 'Срок кредита (месяцев)',
       type: 'number',
-      min: LOAN_LIMITS.minTerm,
-      max: LOAN_LIMITS.maxTerm,
       placeholder: 'Введите срок',
+      min: LOAN_TERM_MIN,
+      max: LOAN_TERM_MAX,
     },
   },
   loanPurpose: {
@@ -263,30 +268,29 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
     },
   },
 
-  // Ипотека (условные поля)
+  // Условные поля для ипотеки
   propertyValue: {
-    value: undefined,
+    value: null,
     component: Input,
     componentProps: {
       label: 'Стоимость недвижимости (₽)',
       type: 'number',
-      min: 1000000,
       placeholder: 'Введите стоимость',
+      min: 1000000,
     },
   },
   initialPayment: {
-    value: undefined,
+    value: null,
     component: Input,
     componentProps: {
       label: 'Первоначальный взнос (₽)',
       type: 'number',
-      min: 0,
-      placeholder: 'Автоматически рассчитывается',
+      placeholder: 'Автоматически вычисляется',
       disabled: true,
     },
   },
 
-  // Автокредит (условные поля)
+  // Условные поля для автокредита
   carBrand: {
     value: '',
     component: Input,
@@ -298,59 +302,37 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
     componentProps: { label: 'Модель автомобиля', placeholder: 'Например: Camry' },
   },
   carYear: {
-    value: undefined,
+    value: null,
     component: Input,
     componentProps: {
       label: 'Год выпуска',
       type: 'number',
-      min: CAR_LIMITS.minYear,
-      max: CAR_LIMITS.maxYear,
       placeholder: '2020',
+      min: CAR_YEAR_MIN,
+      max: CAR_YEAR_MAX,
     },
   },
   carPrice: {
-    value: undefined,
+    value: null,
     component: Input,
     componentProps: {
       label: 'Стоимость автомобиля (₽)',
       type: 'number',
-      min: CAR_LIMITS.minPrice,
-      max: CAR_LIMITS.maxPrice,
       placeholder: 'Введите стоимость',
+      min: 300000,
+      max: 10000000,
     },
   },
 
-  // Вычисляемые поля
-  interestRate: {
-    value: undefined,
-    component: Input,
-    componentProps: {
-      label: 'Процентная ставка (%)',
-      type: 'number',
-      disabled: true,
-      placeholder: 'Рассчитывается автоматически',
-    },
-  },
-  monthlyPayment: {
-    value: undefined,
-    component: Input,
-    componentProps: {
-      label: 'Ежемесячный платеж (₽)',
-      type: 'number',
-      disabled: true,
-      placeholder: 'Рассчитывается автоматически',
-    },
-  },
-
-  // ============================================================================
+  // -------------------------------------------------------------------------
   // Шаг 2: Персональные данные
-  // ============================================================================
+  // -------------------------------------------------------------------------
   personalData: personalDataSchema,
   passportData: passportDataSchema,
   inn: {
     value: '',
     component: InputMask,
-    componentProps: { label: 'ИНН', mask: MASKS.inn, placeholder: '123456789012' },
+    componentProps: { label: 'ИНН', mask: MASKS.inn12, placeholder: '123456789012' },
   },
   snils: {
     value: '',
@@ -358,21 +340,9 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
     componentProps: { label: 'СНИЛС', mask: MASKS.snils, placeholder: '123-456-789 00' },
   },
 
-  // Вычисляемые поля
-  fullName: {
-    value: '',
-    component: Input,
-    componentProps: { label: 'Полное имя', disabled: true, placeholder: 'Фамилия Имя Отчество' },
-  },
-  age: {
-    value: undefined,
-    component: Input,
-    componentProps: { label: 'Возраст (лет)', type: 'number', disabled: true, placeholder: '0' },
-  },
-
-  // ============================================================================
+  // -------------------------------------------------------------------------
   // Шаг 3: Контактная информация
-  // ============================================================================
+  // -------------------------------------------------------------------------
   phoneMain: {
     value: '',
     component: InputMask,
@@ -393,7 +363,11 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
     component: Input,
     componentProps: { label: 'Дополнительный email', type: 'email', placeholder: 'example@mail.com' },
   },
-
+  sameEmail: {
+    value: false,
+    component: Checkbox,
+    componentProps: { label: 'Дополнительный email совпадает с основным' },
+  },
   registrationAddress: addressSchema,
   sameAsRegistration: {
     value: true,
@@ -402,16 +376,16 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
   },
   residenceAddress: addressSchema,
 
-  // ============================================================================
+  // -------------------------------------------------------------------------
   // Шаг 4: Информация о занятости
-  // ============================================================================
+  // -------------------------------------------------------------------------
   employmentStatus: {
     value: 'employed',
     component: RadioGroup,
-    componentProps: { label: 'Статус занятости', options: EMPLOYMENT_STATUS_OPTIONS },
+    componentProps: { label: 'Статус занятости', options: EMPLOYMENT_STATUSES },
   },
 
-  // Работа по найму (условные поля)
+  // Условные поля для работающих по найму
   companyName: {
     value: '',
     component: Input,
@@ -420,7 +394,7 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
   companyInn: {
     value: '',
     component: InputMask,
-    componentProps: { label: 'ИНН компании', mask: MASKS.companyInn, placeholder: '1234567890' },
+    componentProps: { label: 'ИНН компании', mask: MASKS.inn10, placeholder: '1234567890' },
   },
   companyPhone: {
     value: '',
@@ -438,7 +412,36 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
     componentProps: { label: 'Должность', placeholder: 'Ваша должность' },
   },
 
-  // ИП (условные поля)
+  // Стаж
+  workExperienceTotal: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Общий стаж работы (месяцев)', type: 'number', placeholder: '0', min: 0 },
+  },
+  workExperienceCurrent: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Стаж на текущем месте (месяцев)', type: 'number', placeholder: '0', min: 0 },
+  },
+
+  // Доход
+  monthlyIncome: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Ежемесячный доход (₽)', type: 'number', placeholder: '0', min: 10000 },
+  },
+  additionalIncome: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Дополнительный доход (₽)', type: 'number', placeholder: '0', min: 0 },
+  },
+  additionalIncomeSource: {
+    value: '',
+    component: Input,
+    componentProps: { label: 'Источник дополнительного дохода', placeholder: 'Опишите источник' },
+  },
+
+  // Условные поля для ИП
   businessType: {
     value: '',
     component: Input,
@@ -447,7 +450,7 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
   businessInn: {
     value: '',
     component: InputMask,
-    componentProps: { label: 'ИНН ИП', mask: MASKS.inn, placeholder: '123456789012' },
+    componentProps: { label: 'ИНН ИП', mask: MASKS.inn12, placeholder: '123456789012' },
   },
   businessActivity: {
     value: '',
@@ -455,110 +458,58 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
     componentProps: { label: 'Вид деятельности', placeholder: 'Опишите вид деятельности', rows: 2 },
   },
 
-  // Стаж и доход
-  workExperienceTotal: {
-    value: undefined,
-    component: Input,
-    componentProps: { label: 'Общий стаж работы (месяцев)', type: 'number', min: 0, placeholder: '0' },
-  },
-  workExperienceCurrent: {
-    value: undefined,
-    component: Input,
-    componentProps: { label: 'Стаж на текущем месте (месяцев)', type: 'number', min: 0, placeholder: '0' },
-  },
-  monthlyIncome: {
-    value: undefined,
-    component: Input,
-    componentProps: { label: 'Ежемесячный доход (₽)', type: 'number', min: 10000, placeholder: '0' },
-  },
-  additionalIncome: {
-    value: undefined,
-    component: Input,
-    componentProps: { label: 'Дополнительный доход (₽)', type: 'number', min: 0, placeholder: '0' },
-  },
-  additionalIncomeSource: {
-    value: '',
-    component: Input,
-    componentProps: { label: 'Источник дополнительного дохода', placeholder: 'Опишите источник' },
-  },
-
-  // Вычисляемые поля
-  totalIncome: {
-    value: undefined,
-    component: Input,
-    componentProps: {
-      label: 'Общий доход (₽)',
-      type: 'number',
-      disabled: true,
-      placeholder: 'Рассчитывается автоматически',
-    },
-  },
-
-  // ============================================================================
+  // -------------------------------------------------------------------------
   // Шаг 5: Дополнительная информация
-  // ============================================================================
+  // -------------------------------------------------------------------------
   maritalStatus: {
     value: 'single',
     component: RadioGroup,
-    componentProps: { label: 'Семейное положение', options: MARITAL_STATUS_OPTIONS },
+    componentProps: { label: 'Семейное положение', options: MARITAL_STATUSES },
   },
   dependents: {
     value: 0,
     component: Input,
-    componentProps: { label: 'Количество иждивенцев', type: 'number', min: 0, max: 10, placeholder: '0' },
+    componentProps: {
+      label: 'Количество иждивенцев',
+      type: 'number',
+      placeholder: '0',
+      min: 0,
+      max: DEPENDENTS_MAX,
+    },
   },
   education: {
     value: 'higher',
     component: Select,
-    componentProps: { label: 'Образование', options: EDUCATION_OPTIONS, placeholder: 'Выберите уровень образования' },
+    componentProps: { label: 'Образование', options: EDUCATION_LEVELS, placeholder: 'Выберите уровень образования' },
   },
 
+  // Имущество
   hasProperty: {
     value: false,
     component: Checkbox,
     componentProps: { label: 'У меня есть имущество' },
   },
-  properties: [propertySchema],
+  properties: [propertyItemSchema],
 
+  // Существующие кредиты
   hasExistingLoans: {
     value: false,
     component: Checkbox,
     componentProps: { label: 'У меня есть другие кредиты' },
   },
-  existingLoans: [existingLoanSchema],
+  existingLoans: [existingLoanItemSchema],
 
+  // Созаемщики
   hasCoBorrower: {
     value: false,
     component: Checkbox,
     componentProps: { label: 'Добавить созаемщика' },
   },
-  coBorrowers: [coBorrowerSchema],
+  coBorrowers: [coBorrowerItemSchema],
 
-  // Вычисляемые поля
-  paymentToIncomeRatio: {
-    value: undefined,
-    component: Input,
-    componentProps: {
-      label: 'Процент платежа от дохода (%)',
-      type: 'number',
-      disabled: true,
-      placeholder: 'Рассчитывается автоматически',
-    },
-  },
-  coBorrowersIncome: {
-    value: undefined,
-    component: Input,
-    componentProps: {
-      label: 'Доход созаемщиков (₽)',
-      type: 'number',
-      disabled: true,
-      placeholder: 'Рассчитывается автоматически',
-    },
-  },
-
-  // ============================================================================
-  // Шаг 6: Подтверждение и согласия
-  // ============================================================================
+  // -------------------------------------------------------------------------
+  // Шаг 6: Согласия
+  // -------------------------------------------------------------------------
   agreePersonalData: {
     value: false,
     component: Checkbox,
@@ -589,4 +540,78 @@ export const creditApplicationSchema: FormSchema<CreditApplicationForm> = {
     component: InputMask,
     componentProps: { label: 'Код подтверждения из СМС', mask: MASKS.smsCode, placeholder: '123456' },
   },
+
+  // -------------------------------------------------------------------------
+  // Вычисляемые поля (readonly)
+  // -------------------------------------------------------------------------
+  interestRate: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Процентная ставка (%)', type: 'number', disabled: true },
+  },
+  monthlyPayment: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Ежемесячный платеж (₽)', type: 'number', disabled: true },
+  },
+  fullName: {
+    value: '',
+    component: Input,
+    componentProps: { label: 'Полное имя', disabled: true },
+  },
+  age: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Возраст (лет)', type: 'number', disabled: true },
+  },
+  totalIncome: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Общий доход (₽)', type: 'number', disabled: true },
+  },
+  paymentToIncomeRatio: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Процент платежа от дохода (%)', type: 'number', disabled: true },
+  },
+  coBorrowersIncome: {
+    value: null,
+    component: Input,
+    componentProps: { label: 'Доход созаемщиков (₽)', type: 'number', disabled: true },
+  },
+};
+
+// ============================================================================
+// Дефолтные элементы для массивов (для добавления новых элементов)
+// ============================================================================
+
+export const defaultPropertyItem: Property = {
+  type: 'apartment',
+  description: '',
+  estimatedValue: undefined,
+  hasEncumbrance: false,
+};
+
+export const defaultExistingLoanItem: ExistingLoan = {
+  bank: '',
+  type: '',
+  amount: undefined,
+  remainingAmount: undefined,
+  monthlyPayment: undefined,
+  maturityDate: '',
+};
+
+export const defaultCoBorrowerItem: CoBorrower = {
+  personalData: {
+    lastName: '',
+    firstName: '',
+    middleName: '',
+    birthDate: '',
+    gender: 'male',
+    birthPlace: '',
+  },
+  phone: '',
+  email: '',
+  relationship: '',
+  monthlyIncome: undefined,
 };

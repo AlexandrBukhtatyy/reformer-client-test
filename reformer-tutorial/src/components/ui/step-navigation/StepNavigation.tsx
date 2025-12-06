@@ -48,13 +48,7 @@ function StepNavigationInner<T extends Record<string, any>>(
 
     setIsValidating(true);
     try {
-      const isValid = await validateForm(form, schema);
-      console.log(`Step ${currentStep} validation result:`, isValid);
-      if (!isValid) {
-        console.log('Form errors:', form.errors);
-        console.log('Form value:', form.value);
-      }
-      return isValid;
+      return await validateForm(form, schema);
     } finally {
       setIsValidating(false);
     }

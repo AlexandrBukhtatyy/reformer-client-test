@@ -1,58 +1,61 @@
 /**
- * Индикатор прогресса шагов формы
+ * Индикатор прогресса по шагам формы
  */
 
 import { cn } from '@/lib/utils';
-import { FORM_STEPS } from '../model/constants';
 
 interface StepProgressBarProps {
   currentStep: number;
+  totalSteps: number;
   completedSteps: number[];
-  onStepClick?: (step: number) => void;
 }
 
-export function StepProgressBar({ currentStep, completedSteps, onStepClick }: StepProgressBarProps) {
+const STEP_TITLES = [
+  'Кредит',
+  'Данные',
+  'Контакты',
+  'Работа',
+  'Дополнительно',
+  'Подтверждение',
+];
+
+export function StepProgressBar({ currentStep, totalSteps, completedSteps }: StepProgressBarProps) {
   return (
     <div className="mb-8">
-      {/* Desktop view */}
-      <div className="hidden md:flex items-center justify-between">
-        {FORM_STEPS.map((step, index) => {
-          const isCompleted = completedSteps.includes(step.number);
-          const isCurrent = currentStep === step.number;
-          const isClickable = step.number === 1 || completedSteps.includes(step.number - 1);
+      {/* Прогресс-бар */}
+      <div className="flex items-center justify-between mb-4">
+        {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => {
+          const isCompleted = completedSteps.includes(step);
+          const isCurrent = step === currentStep;
+          const isAccessible = step === 1 || completedSteps.includes(step - 1);
 
           return (
-            <div key={step.number} className="flex items-center flex-1">
-              <button
-                type="button"
-                onClick={() => isClickable && onStepClick?.(step.number)}
-                disabled={!isClickable}
+            <div key={step} className="flex items-center flex-1">
+              {/* Круг с номером шага */}
+              <div
                 className={cn(
-                  'flex items-center justify-center w-10 h-10 rounded-full border-2 font-medium text-sm transition-colors',
-                  isCompleted && 'bg-green-500 border-green-500 text-white',
-                  isCurrent && !isCompleted && 'bg-blue-500 border-blue-500 text-white',
-                  !isCurrent && !isCompleted && 'bg-white border-gray-300 text-gray-500',
-                  isClickable && !isCurrent && 'cursor-pointer hover:border-blue-300',
-                  !isClickable && 'cursor-not-allowed'
+                  'w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-colors',
+                  isCurrent && 'bg-blue-600 text-white ring-4 ring-blue-200',
+                  isCompleted && !isCurrent && 'bg-green-500 text-white',
+                  !isCompleted && !isCurrent && isAccessible && 'bg-gray-200 text-gray-600',
+                  !isCompleted && !isCurrent && !isAccessible && 'bg-gray-100 text-gray-400'
                 )}
               >
-                {isCompleted ? '✓' : step.number}
-              </button>
-              <div className="ml-3 flex-1">
-                <p
-                  className={cn(
-                    'text-sm font-medium',
-                    isCurrent ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
-                  )}
-                >
-                  {step.title}
-                </p>
+                {isCompleted && !isCurrent ? (
+                  <svg className="w-5 h-5\" fill="none\" stroke="currentColor\" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  step
+                )}
               </div>
-              {index < FORM_STEPS.length - 1 && (
+
+              {/* Линия между шагами */}
+              {step < totalSteps && (
                 <div
                   className={cn(
-                    'flex-1 h-0.5 mx-4',
-                    isCompleted ? 'bg-green-500' : 'bg-gray-200'
+                    'flex-1 h-1 mx-2 rounded',
+                    completedSteps.includes(step) ? 'bg-green-500' : 'bg-gray-200'
                   )}
                 />
               )}
@@ -61,22 +64,19 @@ export function StepProgressBar({ currentStep, completedSteps, onStepClick }: St
         })}
       </div>
 
-      {/* Mobile view */}
-      <div className="md:hidden">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-900">
-            Шаг {currentStep} из {FORM_STEPS.length}
-          </span>
-          <span className="text-sm text-gray-500">
-            {FORM_STEPS[currentStep - 1]?.title}
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+      {/* Названия шагов */}
+      <div className="flex justify-between">
+        {STEP_TITLES.slice(0, totalSteps).map((title, i) => (
           <div
-            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(currentStep / FORM_STEPS.length) * 100}%` }}
-          />
-        </div>
+            key={i}
+            className={cn(
+              'text-xs text-center flex-1',
+              i + 1 === currentStep ? 'text-blue-600 font-medium' : 'text-gray-500'
+            )}
+          >
+            {title}
+          </div>
+        ))}
       </div>
     </div>
   );
