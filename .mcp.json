@@ -2,7 +2,13 @@
   "mcpServers": {
     "reformer-mcp": {
       "command": "node",
-      "args": ["/[YOUR_PATH_TO_REFORMER_MCP]/reformer-mcp/dist/index.js"]
+      "args": [
+        "/Users/aleksandrbuhtatyj/Work/My/ReFormer/packages/reformer-mcp/dist/index.js"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
     }
   }
 }
