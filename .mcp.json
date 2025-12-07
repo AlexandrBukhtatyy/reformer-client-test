@@ -2,7 +2,7 @@
   "mcpServers": {
     "reformer-mcp": {
       "command": "node",
-      "args": ["/Users/aleksandrbuhtatyj/Work/My/ReFormer/packages/reformer-mcp/dist/index.js"]
+      "args": ["/[YOUR_PATH_TO_REFORMER_MCP]/ReFormer/packages/reformer-mcp/dist/index.js"]
     }
   }
 }
