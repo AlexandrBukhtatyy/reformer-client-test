@@ -20,7 +20,7 @@
 
 ## Входные данные
 
-**Спецификация формы:** `spec/credit-application-form.md`
+**Спецификация формы:** `spec/[form-name].md` - файл в формате шаблона `form-documentation.template.md`
 
 ---
 
@@ -74,7 +74,7 @@
 **Ожидаемая структура для complex формы:**
 
 ```
-src/features/credit-application-form/
+src/features/[form-name]/
 ├── types.ts                 # TypeScript интерфейсы
 ├── schema.ts                # createForm + FormSchema
 ├── validation.ts            # ValidationSchemaFn (или validation/ для шагов)

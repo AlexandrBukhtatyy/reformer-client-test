@@ -1,9 +1,9 @@
-import { CreditApplicationForm } from "./features/credit-application/components/CreditApplicationForm"
+import { Button } from "@/components/ui/button"
 
 function App() {
   return (
     <div className="flex min-h-svh flex-col items-center py-6">
-      <CreditApplicationForm/>
+      <Button>Click me</Button>
     </div>
   )
 }
