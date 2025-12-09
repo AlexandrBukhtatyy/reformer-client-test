@@ -29,19 +29,19 @@ export const step1Validation: ValidationSchemaFn<CreditApplicationForm> = (path)
   minLength(path.loanPurpose, 10, { message: "Цель кредита должна содержать минимум 10 символов" });
   maxLength(path.loanPurpose, 500, { message: "Цель кредита не должна превышать 500 символов" });
 
- // Валидация для ипотеки
+  // Валидация для ипотеки
   validate(path.loanType, (value, ctx) => {
     if (value === "mortgage") {
-      if (ctx.form.propertyValue.value === null || ctx.form.propertyValue.value === undefined || ctx.form.propertyValue.value.value === null || ctx.form.propertyValue.value.value === undefined) {
+      const propertyValue = ctx.form.propertyValue.value;
+      if (propertyValue === null || propertyValue === undefined) {
         return { code: "required", message: "Укажите стоимость недвижимости" };
       }
-      if (ctx.form.propertyValue.value.value !== null && ctx.form.propertyValue.value.value < 10000) {
-        return { code: "minPropertyValue", message: "Стоимость недвижимости должна быть не менее 1 00 000 ₽" };
+      if (propertyValue < 1000000) {
+        return { code: "minPropertyValue", message: "Стоимость недвижимости должна быть не менее 1 000 000 ₽" };
       }
-      
+
       // Валидация первоначального взноса (20% от стоимости недвижимости)
-      const initialPayment = ctx.form.initialPayment.value.value;
-      const propertyValue = ctx.form.propertyValue.value.value;
+      const initialPayment = ctx.form.initialPayment.value;
       if (initialPayment === null || initialPayment === undefined) {
         return { code: "required", message: "Первоначальный взнос обязателен" };
       }
@@ -55,35 +55,36 @@ export const step1Validation: ValidationSchemaFn<CreditApplicationForm> = (path)
   // Валидация для автокредита
   validate(path.loanType, (value, ctx) => {
     if (value === "car") {
-      if (!ctx.form.carBrand.value || !ctx.form.carBrand.value.value) {
+      const carBrand = ctx.form.carBrand.value;
+      const carModel = ctx.form.carModel.value;
+      const carYear = ctx.form.carYear.value;
+      const carPrice = ctx.form.carPrice.value;
+
+      if (!carBrand) {
         return { code: "required", message: "Укажите марку автомобиля" };
       }
-      if (!ctx.form.carModel.value || !ctx.form.carModel.value.value) {
+      if (!carModel) {
         return { code: "required", message: "Укажите модель автомобиля" };
       }
-      if (!ctx.form.carYear.value || !ctx.form.carYear.value.value) {
+      if (!carYear) {
         return { code: "required", message: "Укажите год выпуска" };
       }
-      if (!ctx.form.carPrice.value || !ctx.form.carPrice.value.value) {
+      if (!carPrice) {
         return { code: "required", message: "Укажите стоимость автомобиля" };
       }
 
-      const carYear = ctx.form.carYear.value.value;
       if (carYear && (carYear < 2000 || carYear > new Date().getFullYear() + 1)) {
         return { code: "invalidCarYear", message: "Год выпуска должен быть от 2000 до " + (new Date().getFullYear() + 1) };
       }
-      
-      const carPrice = ctx.form.carPrice.value.value;
-      if (carPrice && (carPrice < 3000 || carPrice > 10000000)) {
+
+      if (carPrice && (carPrice < 300000 || carPrice > 10000000)) {
         return { code: "invalidCarPrice", message: "Стоимость автомобиля должна быть от 300 000 до 10 000 000 ₽" };
       }
 
-      const carBrand = ctx.form.carBrand.value.value;
       if (carBrand && (carBrand.length < 2 || carBrand.length > 50)) {
         return { code: "invalidCarBrand", message: "Марка автомобиля должна содержать от 2 до 50 символов" };
       }
 
-      const carModel = ctx.form.carModel.value.value;
       if (carModel && (carModel.length < 1 || carModel.length > 50)) {
         return { code: "invalidCarModel", message: "Модель автомобиля должна содержать от 1 до 50 символов" };
       }
@@ -160,19 +161,19 @@ export const step3Validation: ValidationSchemaFn<CreditApplicationForm> = (path)
   // Валидация адреса проживания, если он отличается от регистрации
   validate(path.sameAsRegistration, (value, ctx) => {
     if (!value) {
-      if (!ctx.form.residenceAddress.region.value || !ctx.form.residenceAddress.region.value.value) {
+      if (!ctx.form.residenceAddress.region.value) {
         return { code: "required", message: "Укажите регион проживания" };
       }
-      if (!ctx.form.residenceAddress.city.value || !ctx.form.residenceAddress.city.value.value) {
+      if (!ctx.form.residenceAddress.city.value) {
         return { code: "required", message: "Укажите город проживания" };
       }
-      if (!ctx.form.residenceAddress.street.value || !ctx.form.residenceAddress.street.value.value) {
+      if (!ctx.form.residenceAddress.street.value) {
         return { code: "required", message: "Укажите улицу проживания" };
       }
-      if (!ctx.form.residenceAddress.house.value || !ctx.form.residenceAddress.house.value.value) {
+      if (!ctx.form.residenceAddress.house.value) {
         return { code: "required", message: "Укажите дом проживания" };
       }
-      if (!ctx.form.residenceAddress.postalCode.value || !ctx.form.residenceAddress.postalCode.value.value) {
+      if (!ctx.form.residenceAddress.postalCode.value) {
         return { code: "required", message: "Укажите почтовый индекс проживания" };
       }
     }
@@ -203,13 +204,13 @@ export const step4Validation: ValidationSchemaFn<CreditApplicationForm> = (path)
   // Валидация для работающих по найму
   validate(path.employmentStatus, (value, ctx) => {
     if (value === "employed") {
-      if (!ctx.form.companyName.value || !ctx.form.companyName.value) {
+      if (!ctx.form.companyName.value) {
         return { code: "required", message: "Укажите название компании" };
       }
-      if (!ctx.form.companyInn.value || !ctx.form.companyInn.value.value) {
+      if (!ctx.form.companyInn.value) {
         return { code: "required", message: "Укажите ИНН компании" };
       }
-      if (!ctx.form.position.value || !ctx.form.position.value.value) {
+      if (!ctx.form.position.value) {
         return { code: "required", message: "Укажите должность" };
       }
     }
@@ -219,13 +220,13 @@ export const step4Validation: ValidationSchemaFn<CreditApplicationForm> = (path)
   // Валидация для ИП
   validate(path.employmentStatus, (value, ctx) => {
     if (value === "selfEmployed") {
-      if (!ctx.form.businessType.value || !ctx.form.businessType.value.value) {
+      if (!ctx.form.businessType.value) {
         return { code: "required", message: "Укажите тип бизнеса" };
       }
-      if (!ctx.form.businessInn.value || !ctx.form.businessInn.value.value) {
+      if (!ctx.form.businessInn.value) {
         return { code: "required", message: "Укажите ИНН ИП" };
       }
-      if (!ctx.form.businessActivity.value || !ctx.form.businessActivity.value.value) {
+      if (!ctx.form.businessActivity.value) {
         return { code: "required", message: "Опишите вид деятельности" };
       }
     }
@@ -234,7 +235,7 @@ export const step4Validation: ValidationSchemaFn<CreditApplicationForm> = (path)
 
   // Валидация для дополнительного дохода
   validate(path.additionalIncome, (value, ctx) => {
-    if (value && value > 0 && (!ctx.form.additionalIncomeSource.value || !ctx.form.additionalIncomeSource.value.value)) {
+    if (value && value > 0 && !ctx.form.additionalIncomeSource.value) {
       return { code: "required", message: "Укажите источник дополнительного дохода" };
     }
     return null;
@@ -252,7 +253,8 @@ export const step5Validation: ValidationSchemaFn<CreditApplicationForm> = (path)
 
   // Валидация массива имущества, если отмечено
   validate(path.hasProperty, (value, ctx) => {
-    if (value && (!ctx.form.properties.value || !ctx.form.properties.value.value || ctx.form.properties.value.value.length === 0)) {
+    const properties = ctx.form.properties.value;
+    if (value && (!properties || properties.length === 0)) {
       return { code: "required", message: "Добавьте хотя бы один объект имущества" };
     }
     return null;
@@ -260,7 +262,8 @@ export const step5Validation: ValidationSchemaFn<CreditApplicationForm> = (path)
 
   // Валидация массива существующих кредитов, если отмечено
   validate(path.hasExistingLoans, (value, ctx) => {
-    if (value && (!ctx.form.existingLoans.value || !ctx.form.existingLoans.value || ctx.form.existingLoans.value.length === 0)) {
+    const existingLoans = ctx.form.existingLoans.value;
+    if (value && (!existingLoans || existingLoans.length === 0)) {
       return { code: "required", message: "Добавьте хотя бы один существующий кредит" };
     }
     return null;
@@ -268,7 +271,8 @@ export const step5Validation: ValidationSchemaFn<CreditApplicationForm> = (path)
 
   // Валидация массива созаемщиков, если отмечено
   validate(path.hasCoBorrower, (value, ctx) => {
-    if (value && (!ctx.form.coBorrowers.value || !ctx.form.coBorrowers.value.value || ctx.form.coBorrowers.value.value.length === 0)) {
+    const coBorrowers = ctx.form.coBorrowers.value;
+    if (value && (!coBorrowers || coBorrowers.length === 0)) {
       return { code: "required", message: "Добавьте хотя бы одного созаемщика" };
     }
     return null;

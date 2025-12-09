@@ -27,7 +27,7 @@ export function CreditApplicationForm() {
       
       <StepNavigation
         ref={navRef}
-        form={formInstance.controls}
+        form={formInstance}
         config={config}
       >
         {({ currentStep, isFirstStep, isLastStep, isValidating }) => (
@@ -53,12 +53,12 @@ export function CreditApplicationForm() {
             </div>
 
             <div className="mt-8">
-              {currentStep === 1 && <LoanInfoStep control={formInstance.controls} />}
-              {currentStep === 2 && <PersonalInfoStep control={formInstance.controls} />}
-              {currentStep === 3 && <ContactInfoStep control={formInstance.controls} />}
-              {currentStep === 4 && <EmploymentInfoStep control={formInstance.controls} />}
-              {currentStep === 5 && <AdditionalInfoStep control={formInstance.controls} />}
-              {currentStep === 6 && <ConfirmationStep control={formInstance.controls} />}
+              {currentStep === 1 && <LoanInfoStep control={formInstance} />}
+              {currentStep === 2 && <PersonalInfoStep control={formInstance} />}
+              {currentStep === 3 && <ContactInfoStep control={formInstance} />}
+              {currentStep === 4 && <EmploymentInfoStep control={formInstance} />}
+              {currentStep === 5 && <AdditionalInfoStep control={formInstance} />}
+              {currentStep === 6 && <ConfirmationStep control={formInstance} />}
             </div>
 
             <div className="flex justify-between mt-8">

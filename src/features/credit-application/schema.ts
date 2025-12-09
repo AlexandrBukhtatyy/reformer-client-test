@@ -225,7 +225,7 @@ const formSchema: FormSchema<CreditApplicationForm> = {
     component: InputMask,
     componentProps: {
       label: "ИНН",
-      mask: "999999",
+      mask: "999999999999",
       placeholder: "123456789012",
     },
   },
@@ -245,7 +245,7 @@ const formSchema: FormSchema<CreditApplicationForm> = {
     component: InputMask,
     componentProps: {
       label: "Основной телефон",
-      mask: "+7 (999) 999-99-9",
+      mask: "+7 (999) 999-99-99",
       placeholder: "+7 (___) ___-__-__",
     },
   },
@@ -380,8 +380,8 @@ const formSchema: FormSchema<CreditApplicationForm> = {
       component: InputMask,
       componentProps: {
         label: "Индекс",
-        mask: "99999",
-        placeholder: "0000",
+        mask: "999999",
+        placeholder: "000000",
       },
     },
   },
@@ -414,7 +414,7 @@ const formSchema: FormSchema<CreditApplicationForm> = {
     component: InputMask,
     componentProps: {
       label: "ИНН компании",
-      mask: "999999999",
+      mask: "9999999999",
       placeholder: "1234567890",
     },
   },
@@ -504,7 +504,7 @@ const formSchema: FormSchema<CreditApplicationForm> = {
     component: InputMask,
     componentProps: {
       label: "ИНН ИП",
-      mask: "9999999",
+      mask: "999999999999",
       placeholder: "123456789012",
     },
   },
@@ -735,7 +735,7 @@ const formSchema: FormSchema<CreditApplicationForm> = {
       component: InputMask,
       componentProps: {
         label: "Телефон",
-        mask: "+7 (999) 999-99-9",
+        mask: "+7 (999) 999-99-99",
         placeholder: "+7 (___) ___-__-__",
       },
     },
@@ -804,12 +804,12 @@ const formSchema: FormSchema<CreditApplicationForm> = {
       label: "Подтверждаю точность введенных данных",
     },
   },
- electronicSignature: {
+   electronicSignature: {
     value: "",
     component: InputMask,
     componentProps: {
       label: "Код подтверждения из СМС",
-      mask: "9999",
+      mask: "999999",
       placeholder: "123456",
     },
   },

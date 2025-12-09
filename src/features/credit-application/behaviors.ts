@@ -6,11 +6,11 @@ import type { CreditApplicationForm } from "./types";
 
 export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
  // Вычисляемое поле: полное имя
-  watchField(path.personalData.lastName, (value, ctx) => {
-    const lastName = ctx.form.personalData.lastName.value;
-    const firstName = ctx.form.personalData.firstName.value;
-    const middleName = ctx.form.personalData.middleName.value;
-    
+  watchField(path.personalData.lastName, (_value, ctx) => {
+    const lastName = ctx.form.personalData.lastName.value.value;
+    const firstName = ctx.form.personalData.firstName.value.value;
+    const middleName = ctx.form.personalData.middleName.value.value;
+
     if (lastName && firstName && middleName) {
       ctx.setFieldValue("fullName", `${lastName} ${firstName} ${middleName}`);
     } else {
@@ -18,11 +18,11 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
     }
   });
 
-  watchField(path.personalData.firstName, (value, ctx) => {
-    const lastName = ctx.form.personalData.lastName.value;
-    const firstName = ctx.form.personalData.firstName.value;
-    const middleName = ctx.form.personalData.middleName.value;
-    
+  watchField(path.personalData.firstName, (_value, ctx) => {
+    const lastName = ctx.form.personalData.lastName.value.value;
+    const firstName = ctx.form.personalData.firstName.value.value;
+    const middleName = ctx.form.personalData.middleName.value.value;
+
     if (lastName && firstName && middleName) {
       ctx.setFieldValue("fullName", `${lastName} ${firstName} ${middleName}`);
     } else {
@@ -30,11 +30,11 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
     }
   });
 
-  watchField(path.personalData.middleName, (value, ctx) => {
-    const lastName = ctx.form.personalData.lastName.value;
-    const firstName = ctx.form.personalData.firstName.value;
-    const middleName = ctx.form.personalData.middleName.value;
-    
+  watchField(path.personalData.middleName, (_value, ctx) => {
+    const lastName = ctx.form.personalData.lastName.value.value;
+    const firstName = ctx.form.personalData.firstName.value.value;
+    const middleName = ctx.form.personalData.middleName.value.value;
+
     if (lastName && firstName && middleName) {
       ctx.setFieldValue("fullName", `${lastName} ${firstName} ${middleName}`);
     } else {
@@ -59,15 +59,15 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
   });
 
   // Вычисляемое поле: общий доход
-  watchField(path.monthlyIncome, (value, ctx) => {
-    const income = ctx.form.monthlyIncome.value || 0;
-    const additional = ctx.form.additionalIncome.value || 0;
+  watchField(path.monthlyIncome, (_value, ctx) => {
+    const income = ctx.form.monthlyIncome.value.value || 0;
+    const additional = ctx.form.additionalIncome.value.value || 0;
     ctx.setFieldValue("totalIncome", income + additional);
   });
 
-  watchField(path.additionalIncome, (value, ctx) => {
-    const income = ctx.form.monthlyIncome.value || 0;
-    const additional = ctx.form.additionalIncome.value || 0;
+  watchField(path.additionalIncome, (_value, ctx) => {
+    const income = ctx.form.monthlyIncome.value.value || 0;
+    const additional = ctx.form.additionalIncome.value.value || 0;
     ctx.setFieldValue("totalIncome", income + additional);
   });
 
@@ -102,12 +102,12 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
     }
     
     // Снижение ставки при наличии имущества
-    if (ctx.form.hasProperty.value) {
+    if (ctx.form.hasProperty.value.value) {
       baseRate -= 0.5;
     }
     
     // Региональный коэффициент (упрощенный)
-    const region = ctx.form.registrationAddress.region.value;
+    const region = ctx.form.registrationAddress.region.value.value;
     if (region && region.toLowerCase().includes("москва")) {
       baseRate -= 0.2;
     } else if (region && region.toLowerCase().includes("спб")) {
@@ -121,7 +121,7 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
   watchField(path.hasProperty, (value, ctx) => {
     // Пересчитаем ставку при изменении наличия имущества
     let baseRate = 0;
-    switch(ctx.form.loanType.value) {
+    switch(ctx.form.loanType.value.value) {
       case "mortgage":
         baseRate = 8.5;
         break;
@@ -144,7 +144,7 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
     }
     
     // Региональный коэффициент (упрощенный)
-    const region = ctx.form.registrationAddress.region.value;
+    const region = ctx.form.registrationAddress.region.value.value;
     if (region && region.toLowerCase().includes("москва")) {
       baseRate -= 0.2;
     } else if (region && region.toLowerCase().includes("спб")) {
@@ -157,7 +157,7 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
   watchField(path.registrationAddress.region, (value, ctx) => {
     // Пересчитаем ставку при изменении региона
     let baseRate = 0;
-    switch(ctx.form.loanType.value) {
+    switch(ctx.form.loanType.value.value) {
       case "mortgage":
         baseRate = 8.5;
         break;
@@ -175,7 +175,7 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
     }
     
     // Снижение ставки при наличии имущества
-    if (ctx.form.hasProperty.value) {
+    if (ctx.form.hasProperty.value.value) {
       baseRate -= 0.5;
     }
     
@@ -191,29 +191,12 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
   });
 
   // Вычисляемое поле: ежемесячный платеж
-  watchField(path.loanAmount, (value, ctx) => {
+  watchField(path.loanAmount, (_value, ctx) => {
     // Пересчитаем при изменении суммы кредита
-    const amount = ctx.form.loanAmount.value;
-    const term = ctx.form.loanTerm.value;
-    const rate = ctx.form.interestRate.value;
-    
-    if (amount && term && rate) {
-      // Аннуитетная формула: A = P * (r * (1+r)^n) / ((1+r)^n - 1)
-      // где A - ежемесячный платеж, P - сумма кредита, r - месячная ставка, n - количество месяцев
-      const monthlyRate = (rate / 100) / 12;
-      const monthlyPayment = amount * (monthlyRate * Math.pow(1 + monthlyRate, term)) / (Math.pow(1 + monthlyRate, term) - 1);
-      ctx.setFieldValue("monthlyPayment", Math.round(monthlyPayment));
-    } else {
-      ctx.setFieldValue("monthlyPayment", 0);
-    }
- });
+    const amount = ctx.form.loanAmount.value.value;
+    const term = ctx.form.loanTerm.value.value;
+    const rate = ctx.form.interestRate.value.value;
 
-  watchField(path.loanTerm, (value, ctx) => {
-    // Пересчитаем при изменении срока кредита
-    const amount = ctx.form.loanAmount.value;
-    const term = ctx.form.loanTerm.value;
-    const rate = ctx.form.interestRate.value;
-    
     if (amount && term && rate) {
       // Аннуитетная формула: A = P * (r * (1+r)^n) / ((1+r)^n - 1)
       // где A - ежемесячный платеж, P - сумма кредита, r - месячная ставка, n - количество месяцев
@@ -225,12 +208,29 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
     }
   });
 
-  watchField(path.interestRate, (value, ctx) => {
+  watchField(path.loanTerm, (_value, ctx) => {
+    // Пересчитаем при изменении срока кредита
+    const amount = ctx.form.loanAmount.value.value;
+    const term = ctx.form.loanTerm.value.value;
+    const rate = ctx.form.interestRate.value.value;
+
+    if (amount && term && rate) {
+      // Аннуитетная формула: A = P * (r * (1+r)^n) / ((1+r)^n - 1)
+      // где A - ежемесячный платеж, P - сумма кредита, r - месячная ставка, n - количество месяцев
+      const monthlyRate = (rate / 100) / 12;
+      const monthlyPayment = amount * (monthlyRate * Math.pow(1 + monthlyRate, term)) / (Math.pow(1 + monthlyRate, term) - 1);
+      ctx.setFieldValue("monthlyPayment", Math.round(monthlyPayment));
+    } else {
+      ctx.setFieldValue("monthlyPayment", 0);
+    }
+  });
+
+  watchField(path.interestRate, (_value, ctx) => {
     // Пересчитаем при изменении процентной ставки
-    const amount = ctx.form.loanAmount.value;
-    const term = ctx.form.loanTerm.value;
-    const rate = ctx.form.interestRate.value;
-    
+    const amount = ctx.form.loanAmount.value.value;
+    const term = ctx.form.loanTerm.value.value;
+    const rate = ctx.form.interestRate.value.value;
+
     if (amount && term && rate) {
       // Аннуитетная формула: A = P * (r * (1+r)^n) / ((1+r)^n - 1)
       // где A - ежемесячный платеж, P - сумма кредита, r - месячная ставка, n - количество месяцев
@@ -243,35 +243,16 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
   });
 
   // Вычисляемое поле: процент платежа от дохода
-  watchField(path.monthlyPayment, (value, ctx) => {
+  watchField(path.monthlyPayment, (_value, ctx) => {
     // Пересчитаем при изменении ежемесячного платежа
-    const payment = ctx.form.monthlyPayment.value;
-    const totalIncome = ctx.form.totalIncome.value;
-    const coBorrowersIncome = ctx.form.coBorrowersIncome.value;
-    
+    const payment = ctx.form.monthlyPayment.value.value;
+    const totalIncome = ctx.form.totalIncome.value.value;
+    const coBorrowersIncome = ctx.form.coBorrowersIncome.value.value;
+
     if (payment && totalIncome) {
       const combinedIncome = totalIncome + (coBorrowersIncome || 0);
       if (combinedIncome > 0) {
         const ratio = (payment / combinedIncome) * 100;
-        ctx.setFieldValue("paymentToIncomeRatio", Math.round(ratio * 10) / 100); // Округление до 2 знаков
-      } else {
-        ctx.setFieldValue("paymentToIncomeRatio", 0);
-      }
-    } else {
-      ctx.setFieldValue("paymentToIncomeRatio", 0);
-    }
-  });
-
-  watchField(path.totalIncome, (value, ctx) => {
-    // Пересчитаем при изменении общего дохода
-    const payment = ctx.form.monthlyPayment.value;
-    const totalIncome = ctx.form.totalIncome.value;
-    const coBorrowersIncome = ctx.form.coBorrowersIncome.value;
-    
-    if (payment && totalIncome) {
-      const combinedIncome = totalIncome + (coBorrowersIncome || 0);
-      if (combinedIncome > 0) {
-        const ratio = (payment / combinedIncome) * 10;
         ctx.setFieldValue("paymentToIncomeRatio", Math.round(ratio * 100) / 100); // Округление до 2 знаков
       } else {
         ctx.setFieldValue("paymentToIncomeRatio", 0);
@@ -281,17 +262,36 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
     }
   });
 
-  watchField(path.coBorrowersIncome, (value, ctx) => {
-    // Пересчитаем при изменении дохода созаемщиков
-    const payment = ctx.form.monthlyPayment.value;
-    const totalIncome = ctx.form.totalIncome.value;
-    const coBorrowersIncome = ctx.form.coBorrowersIncome.value;
-    
+  watchField(path.totalIncome, (_value, ctx) => {
+    // Пересчитаем при изменении общего дохода
+    const payment = ctx.form.monthlyPayment.value.value;
+    const totalIncome = ctx.form.totalIncome.value.value;
+    const coBorrowersIncome = ctx.form.coBorrowersIncome.value.value;
+
     if (payment && totalIncome) {
       const combinedIncome = totalIncome + (coBorrowersIncome || 0);
       if (combinedIncome > 0) {
         const ratio = (payment / combinedIncome) * 100;
-        ctx.setFieldValue("paymentToIncomeRatio", Math.round(ratio * 100) / 10); // Округление до 2 знаков
+        ctx.setFieldValue("paymentToIncomeRatio", Math.round(ratio * 100) / 100); // Округление до 2 знаков
+      } else {
+        ctx.setFieldValue("paymentToIncomeRatio", 0);
+      }
+    } else {
+      ctx.setFieldValue("paymentToIncomeRatio", 0);
+    }
+  });
+
+  watchField(path.coBorrowersIncome, (_value, ctx) => {
+    // Пересчитаем при изменении дохода созаемщиков
+    const payment = ctx.form.monthlyPayment.value.value;
+    const totalIncome = ctx.form.totalIncome.value.value;
+    const coBorrowersIncome = ctx.form.coBorrowersIncome.value.value;
+
+    if (payment && totalIncome) {
+      const combinedIncome = totalIncome + (coBorrowersIncome || 0);
+      if (combinedIncome > 0) {
+        const ratio = (payment / combinedIncome) * 100;
+        ctx.setFieldValue("paymentToIncomeRatio", Math.round(ratio * 100) / 100); // Округление до 2 знаков
       } else {
         ctx.setFieldValue("paymentToIncomeRatio", 0);
       }
@@ -302,7 +302,7 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
 
  // Вычисляемое поле: первоначальный взнос для ипотеки (20% от стоимости недвижимости)
   watchField(path.propertyValue, (value, ctx) => {
-    if (ctx.form.loanType.value === "mortgage" && value !== null && value !== undefined) {
+    if (ctx.form.loanType.value.value === "mortgage" && value !== null && value !== undefined) {
       const initialPayment = value * 0.2;
       ctx.setFieldValue("initialPayment", Math.round(initialPayment));
     } else {
@@ -373,6 +373,59 @@ export const behaviors: BehaviorSchemaFn<CreditApplicationForm> = (path) => {
   watchField(path.hasCoBorrower, (value, ctx) => {
     if (!value) {
       ctx.setFieldValue("coBorrowers", []);
+    }
+  });
+
+  // Копирование адреса регистрации в адрес проживания при sameAsRegistration=true
+  watchField(path.sameAsRegistration, (value, ctx) => {
+    if (value) {
+      // Копируем все поля адреса регистрации в адрес проживания
+      const regAddress = ctx.form.registrationAddress.value.value;
+      if (regAddress) {
+        ctx.setFieldValue("residenceAddress.region", regAddress.region || "");
+        ctx.setFieldValue("residenceAddress.city", regAddress.city || "");
+        ctx.setFieldValue("residenceAddress.street", regAddress.street || "");
+        ctx.setFieldValue("residenceAddress.house", regAddress.house || "");
+        ctx.setFieldValue("residenceAddress.apartment", regAddress.apartment || "");
+        ctx.setFieldValue("residenceAddress.postalCode", regAddress.postalCode || "");
+      }
+    }
+  });
+
+  // Синхронизация адреса проживания при изменении адреса регистрации (если sameAsRegistration=true)
+  watchField(path.registrationAddress, (value, ctx) => {
+    if (ctx.form.sameAsRegistration.value.value && value) {
+      ctx.setFieldValue("residenceAddress.region", value.region || "");
+      ctx.setFieldValue("residenceAddress.city", value.city || "");
+      ctx.setFieldValue("residenceAddress.street", value.street || "");
+      ctx.setFieldValue("residenceAddress.house", value.house || "");
+      ctx.setFieldValue("residenceAddress.apartment", value.apartment || "");
+      ctx.setFieldValue("residenceAddress.postalCode", value.postalCode || "");
+    }
+  });
+
+  // Очистка города при смене региона регистрации
+  watchField(path.registrationAddress.region, (_value, ctx) => {
+    ctx.setFieldValue("registrationAddress.city", "");
+  });
+
+  // Очистка города при смене региона проживания (только если адреса разные)
+  watchField(path.residenceAddress.region, (_value, ctx) => {
+    if (!ctx.form.sameAsRegistration.value.value) {
+      ctx.setFieldValue("residenceAddress.city", "");
+    }
+  });
+
+  // Очистка адреса проживания при отключении sameAsRegistration
+  watchField(path.sameAsRegistration, (value, ctx) => {
+    if (!value) {
+      // Очищаем адрес проживания для ручного ввода
+      ctx.setFieldValue("residenceAddress.region", "");
+      ctx.setFieldValue("residenceAddress.city", "");
+      ctx.setFieldValue("residenceAddress.street", "");
+      ctx.setFieldValue("residenceAddress.house", "");
+      ctx.setFieldValue("residenceAddress.apartment", "");
+      ctx.setFieldValue("residenceAddress.postalCode", "");
     }
   });
 };

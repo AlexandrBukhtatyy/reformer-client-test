@@ -1,4 +1,5 @@
 import type { GroupNodeWithControls } from "@reformer/core";
+import { useFormControlValue } from "@reformer/core";
 import type { CreditApplicationForm } from "../../types";
 import { FormField } from "../../../../components/ui/FormField";
 
@@ -7,6 +8,9 @@ interface StepProps {
 }
 
 export function LoanInfoStep({ control }: StepProps) {
+  // Используем хук для реактивного получения значения loanType
+  const loanType = useFormControlValue(control.loanType);
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold mb-4">Основная информация о кредите</h2>
@@ -20,7 +24,7 @@ export function LoanInfoStep({ control }: StepProps) {
       <FormField control={control.loanPurpose} />
 
       {/* Условные поля для ипотеки */}
-      {control.loanType.value === 'mortgage' && (
+      {loanType === 'mortgage' && (
         <div className="space-y-4 mt-4 p-4 border rounded bg-gray-50">
           <h3 className="font-medium">Данные недвижимости</h3>
           <FormField control={control.propertyValue} />
@@ -29,7 +33,7 @@ export function LoanInfoStep({ control }: StepProps) {
       )}
 
       {/* Условные поля для автокредита */}
-      {control.loanType.value === 'car' && (
+      {loanType === 'car' && (
         <div className="space-y-4 mt-4 p-4 border rounded bg-gray-50">
           <h3 className="font-medium">Данные автомобиля</h3>
           <FormField control={control.carBrand} />
