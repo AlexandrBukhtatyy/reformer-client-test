@@ -1,4 +1,4 @@
-import type { GroupNodeWithControls } from "@reformer/core";
+import { useFormControlValue, type GroupNodeWithControls } from "@reformer/core";
 import type { CreditApplicationForm } from "../../types";
 import { FormField } from "../../../../components/ui/FormField";
 
@@ -7,6 +7,9 @@ interface StepProps {
 }
 
 export function EmploymentInfoStep({ control }: StepProps) {
+  const employmentStatus = useFormControlValue(control.employmentStatus);
+  const additionalIncome = useFormControlValue(control.additionalIncome) as number;
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold mb-4">Информация о занятости</h2>
@@ -14,7 +17,7 @@ export function EmploymentInfoStep({ control }: StepProps) {
       <FormField control={control.employmentStatus} />
 
       {/* Условные поля для работающих по найму */}
-      {control.employmentStatus.value === 'employed' && (
+      {employmentStatus === 'employed' && (
         <div className="space-y-4 mt-4 p-4 border rounded bg-gray-50">
           <h3 className="font-medium">Информация о работодателе</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -32,7 +35,7 @@ export function EmploymentInfoStep({ control }: StepProps) {
       )}
 
       {/* Условные поля для ИП */}
-      {control.employmentStatus.value === 'selfEmployed' && (
+      {employmentStatus === 'selfEmployed' && (
         <div className="space-y-4 mt-4 p-4 border rounded bg-gray-50">
           <h3 className="font-medium">Информация о бизнесе</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -55,7 +58,7 @@ export function EmploymentInfoStep({ control }: StepProps) {
         <FormField control={control.additionalIncome} />
       </div>
 
-      {control.additionalIncome.value && control.additionalIncome.value > 0 && (
+      {additionalIncome && additionalIncome > 0 && (
         <FormField control={control.additionalIncomeSource} />
       )}
     </div>

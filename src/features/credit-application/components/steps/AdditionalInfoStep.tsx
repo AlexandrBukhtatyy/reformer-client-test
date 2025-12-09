@@ -1,4 +1,4 @@
-import type { GroupNodeWithControls } from "@reformer/core";
+import { useFormControlValue, type GroupNodeWithControls } from "@reformer/core";
 import type { CreditApplicationForm } from "../../types";
 import { FormField } from "../../../../components/ui/FormField";
 import { FormArrayManager } from "../../../../components/ui/FormArrayManager";
@@ -59,6 +59,10 @@ function CoBorrowerItem({ control }: { control: GroupNodeWithControls<CreditAppl
 }
 
 export function AdditionalInfoStep({ control }: StepProps) {
+  const hasProperty = useFormControlValue(control.hasProperty);
+  const hasExistingLoans = useFormControlValue(control.hasExistingLoans);
+  const hasCoBorrower = useFormControlValue(control.hasCoBorrower);
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold mb-4">Дополнительная информация</h2>
@@ -73,7 +77,7 @@ export function AdditionalInfoStep({ control }: StepProps) {
         <FormField control={control.hasProperty} />
       </div>
 
-      {control.hasProperty.value && (
+      {hasProperty && (
         <div className="mt-4">
           <h3 className="text-lg font-medium mb-4">Имущество</h3>
           <FormArrayManager
@@ -88,7 +92,7 @@ export function AdditionalInfoStep({ control }: StepProps) {
         <FormField control={control.hasExistingLoans} />
       </div>
 
-      {control.hasExistingLoans.value && (
+      {hasExistingLoans && (
         <div className="mt-4">
           <h3 className="text-lg font-medium mb-4">Существующие кредиты</h3>
           <FormArrayManager
@@ -103,7 +107,7 @@ export function AdditionalInfoStep({ control }: StepProps) {
         <FormField control={control.hasCoBorrower} />
       </div>
 
-      {control.hasCoBorrower.value && (
+      {hasCoBorrower && (
         <div className="mt-4">
           <h3 className="text-lg font-medium mb-4">Созаемщики</h3>
           <FormArrayManager
