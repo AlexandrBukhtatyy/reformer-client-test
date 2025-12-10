@@ -4,7 +4,7 @@ import { Checkbox } from './checkbox';
 
 export interface FormFieldProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  control: FieldNode<any>;
+ control: FieldNode<any>;
   className?: string;
   testId?: string;
 }
@@ -13,7 +13,12 @@ const FormFieldComponent: React.FC<FormFieldProps> = ({ control, className, test
   const { value, errors, pending, disabled, shouldShowError, componentProps } =
     useFormControl(control);
 
-  const Component = control.component;
+  // Проверка на undefined после вызова хука
+ if (!control) {
+    return <div>Control is undefined</div>;
+  }
+
+  const Component = control.component || 'div';
   const isCheckbox = control.component === Checkbox;
   const safeValue = value ?? (isCheckbox ? false : '');
 

@@ -1,14 +1,1 @@
-{
-  "mcpServers": {
-    "reformer-mcp": {
-      "command": "node",
-      "args": [
-        "D:\\Work\\ReFormer\\packages\\reformer-mcp\\dist\\index.js"
-      ]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"]
-    }
-  }
-}
+{"mcpServers":{"reformer-mcp":{"command":"node","args":["D:\\Work\\ReFormer\\packages\\reformer-mcp\\dist\\index.js"],"alwaysAllow":["get_recommended_structure","generate_types","generate_schema","generate_validation","generate_behavior","check_code"]},"playwright":{"command":"npx","args":["@playwright/mcp@latest"],"alwaysAllow":["browser_navigate","browser_click","browser_fill","browser_fill_form","browser_select_option","browser_run_code","browser_snapshot","browser_console_messages"]}}}
