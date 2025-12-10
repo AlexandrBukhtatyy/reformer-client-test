@@ -1,27 +1,26 @@
+// Insurance Application Form Types
+
 // Enums
 export type InsuranceType = 'casco' | 'osago' | 'property' | 'life' | 'travel';
-export type InsurancePeriod = 3 | 6 | 12 | 24 | 36;
+export type InsuredType = 'individual' | 'corporate';
 export type PaymentType = 'single' | 'installments';
-export type InsuredType = 'individual' | 'company';
-export type Gender = 'male' | 'female';
 export type VehicleBodyType = 'sedan' | 'hatchback' | 'suv' | 'wagon' | 'coupe' | 'minivan' | 'pickup';
 export type VehicleTransmission = 'manual' | 'automatic';
 export type VehicleUsagePurpose = 'personal' | 'taxi' | 'training' | 'commercial';
 export type PropertyType = 'apartment' | 'house' | 'townhouse' | 'commercial' | 'land';
-export type WallMaterial = 'brick' | 'concrete' | 'wood' | 'panel' | 'monolithic' | 'other';
-export type TripPurpose = 'tourism' | 'business' | 'study' | 'work' | 'other';
+export type PropertyWallMaterial = 'brick' | 'concrete' | 'wood' | 'panel' | 'monolithic' | 'other';
 export type TravelDestination = 'europe' | 'asia' | 'us-canada' | 'cis' | 'worldwide';
+export type TravelTripPurpose = 'tourism' | 'business' | 'study' | 'work' | 'other';
 export type ClaimType = 'accident' | 'theft' | 'damage' | 'natural-disaster' | 'medical' | 'other';
-export type Relationship = 'spouse' | 'child' | 'parent' | 'sibling' | 'other';
-export type ReferralSource = 'internet' | 'friend' | 'tv' | 'agent' | 'other';
+export type RelationshipType = 'spouse' | 'child' | 'parent' | 'sibling' | 'other';
 
-// Nested interfaces
+// Nested Interfaces
 export interface PersonalData {
   lastName: string;
   firstName: string;
- middleName?: string;
-  birthDate: string; // ISO date string
-  gender: Gender;
+  middleName: string;
+  birthDate: string;
+  gender: 'male' | 'female';
 }
 
 export interface CompanyData {
@@ -35,26 +34,26 @@ export interface CompanyData {
 export interface PassportData {
   series: string;
   number: string;
- issueDate: string; // ISO date string
+ issueDate: string;
   issuedBy: string;
 }
 
-export interface Vehicle {
+export interface VehicleData {
   vin: string;
   brand: string;
-  model: string;
+ model: string;
   year: number;
   mileage: number;
   enginePower: number;
   bodyType: VehicleBodyType;
   transmission: VehicleTransmission;
-  marketValue?: number;
+  marketValue: number | undefined;
   licensePlate: string;
   registrationCert: string;
   hasAntiTheft: boolean;
-  antiTheftBrand?: string;
+  antiTheftBrand: string;
   garageParking: boolean;
-  usagePurpose: VehicleUsagePurpose;
+ usagePurpose: VehicleUsagePurpose;
 }
 
 export interface PropertyAddress {
@@ -62,18 +61,20 @@ export interface PropertyAddress {
   city: string;
   street: string;
   house: string;
- apartment?: string;
+ apartment: string;
 }
 
-export interface Property {
+export interface PropertyData {
   type: PropertyType;
-  address: PropertyAddress;
+ address: PropertyAddress;
   area: number;
   floors: number;
- floor?: number; // Only for apartments
+  floor: number | undefined;
   yearBuilt: number;
-  wallMaterial: WallMaterial;
+  wallMaterial: PropertyWallMaterial;
   marketValue: number;
+  hasAlarm: boolean;
+  hasFireAlarm: boolean;
   ownershipDoc: string;
 }
 
@@ -85,18 +86,18 @@ export interface PropertyCoverageOptions {
 }
 
 export interface HealthData {
- height: number;
- weight: number;
-  bmi: number; // Computed
-  bloodPressure?: string;
+  height: number | undefined;
+  weight: number | undefined;
+  bmi: number | undefined;
+ bloodPressure: string;
   isSmoker: boolean;
-  smokingYears?: number;
+  smokingYears: number | undefined;
   hasChronicDiseases: boolean;
-  chronicDiseases?: string;
+  chronicDiseases: string;
   hadSurgeries: boolean;
-  surgeries?: string;
+  surgeries: string;
   occupation: string;
- isHighRiskJob: boolean;
+  isHighRiskJob: boolean;
   practicesSports: boolean;
   extremeSports: boolean;
 }
@@ -108,127 +109,126 @@ export interface LifeCoverageOptions {
   accident: boolean;
 }
 
-export interface Travel {
+export interface TravelData {
   destination: TravelDestination;
-  tripPurpose: TripPurpose;
-  departureDate: string; // ISO date string
-  returnDate: string; // ISO date string
-  tripDuration: number; // Computed
+  tripPurpose: TravelTripPurpose;
+  departureDate: string;
+  returnDate: string;
+  tripDuration: number | undefined;
   isMultipleTrips: boolean;
 }
 
 export interface Traveler {
   fullName: string;
-  birthDate: string; // ISO date string
+  birthDate: string;
   passportNumber: string;
 }
 
 export interface TravelCoverageOptions {
   medical: boolean;
   baggage: boolean;
-  tripCancellation: boolean;
+ tripCancellation: boolean;
   flightDelay: boolean;
   carRental: boolean;
 }
 
 export interface Driver {
   fullName: string;
-  birthDate: string; // ISO date string
+  birthDate: string;
   licenseNumber: string;
-  licenseIssueDate: string; // ISO date string
-  drivingExperience: number; // Computed
-  accidentsCount: number;
- isMainDriver: boolean;
+  licenseIssueDate: string;
+  drivingExperience: number | undefined;
+ accidentsCount: number;
+  isMainDriver: boolean;
 }
 
 export interface Beneficiary {
   fullName: string;
-  birthDate: string; // ISO date string
-  relationship: Relationship;
- share: number;
+  birthDate: string;
+  relationship: RelationshipType;
+  share: number | undefined;
   phone: string;
 }
 
 export interface Claim {
-  date: string; // ISO date string
+  date: string;
   type: ClaimType;
   description: string;
- amount: number;
- atFault: boolean;
+ amount: number | undefined;
+  atFault: boolean;
 }
 
-// Main form interface
+// Main Form Interface
 export interface InsuranceApplicationForm {
   // Step 1: Insurance Type and Parameters
   insuranceType: InsuranceType;
-  insurancePeriod: InsurancePeriod;
-  startDate: string; // ISO date string
-  endDate: string; // Computed: startDate + insurancePeriod months
-  coverageAmount: number;
- deductible?: number;
+  insurancePeriod: 3 | 6 | 12 | 24 | 36;
+  startDate: string;
+  endDate: string; // computed
+  coverageAmount: number | undefined;
+  deductible: number | undefined;
   paymentType: PaymentType;
-  installments?: number;
+  installments: number | undefined;
 
-  // Step 2: Insured Person Data
-  insuredType: InsuredType;
+  // Step 2: Insured Data
+ insuredType: InsuredType;
   personalData: PersonalData;
   companyData: CompanyData;
-  passportData: PassportData;
+ passportData: PassportData;
   phone: string;
   email: string;
-  fullName: string; // Computed: lastName + firstName + middleName
-  age: number; // Computed: from birthDate
+  fullName: string; // computed
+  age: number | undefined; // computed
 
-  // Step 3: Insurance Object (depends on insuranceType)
- // Vehicle fields (for casco/osago)
-  vehicle: Vehicle;
-  // Property fields (for property)
-  property: Property;
+  // Step 3: Insurance Object - Vehicle (for casco/osago)
+  vehicle: VehicleData;
+
+  // Step 3: Insurance Object - Property
+  property: PropertyData;
   propertyCoverageOptions: PropertyCoverageOptions;
-  // Health fields (for life)
- health: HealthData;
- lifeCoverageOptions: LifeCoverageOptions;
-  // Travel fields (for travel)
-  travel: Travel;
+
+  // Step 3: Insurance Object - Health (for life)
+  health: HealthData;
+  lifeCoverageOptions: LifeCoverageOptions;
+
+  // Step 3: Insurance Object - Travel
+  travel: TravelData;
   travelers: Traveler[];
   travelCoverageOptions: TravelCoverageOptions;
 
-  // Step 4: Drivers/Beneficiaries (depends on insuranceType)
+  // Step 4: Drivers and Beneficiaries
   drivers: Driver[];
   unlimitedDrivers: boolean;
- minDriverAge: number; // Computed
-  minDriverExperience: number; // Computed
- beneficiaries: Beneficiary[];
-  totalBeneficiaryShare: number; // Computed
+  minDriverAge: number | undefined; // computed
+  minDriverExperience: number | undefined; // computed
+  beneficiaries: Beneficiary[];
+  totalBeneficiaryShare: number | undefined; // computed
 
   // Step 5: History and Additional Info
   hasPreviousInsurance: boolean;
- previousInsurer: string;
+  previousInsurer: string;
   previousPolicyNumber: string;
- previousPolicyEndDate: string; // ISO date string
+  previousPolicyEndDate: string;
   hadClaims: boolean;
   claims: Claim[];
   promoCode: string;
-  referralSource: ReferralSource;
+  referralSource: 'internet' | 'friends' | 'tv' | 'agent' | 'other';
   agentCode: string;
   additionalNotes: string;
 
   // Step 6: Calculation and Confirmation
-  // Computed premium fields
-  basePremium: number;
-  ageCoefficient: number;
-  experienceCoefficient: number;
-  regionCoefficient: number;
-  claimsCoefficient: number;
-  deductibleDiscount: number;
-  promoDiscount: number;
-  multiPolicyDiscount: number;
-  totalPremium: number;
-  installmentAmount: number;
-
-  // Confirmation fields
+ basePremium: number | undefined; // computed
+  ageCoefficient: number | undefined; // computed
+  experienceCoefficient: number | undefined; // computed
+  regionCoefficient: number | undefined; // computed
+ claimsCoefficient: number | undefined; // computed
+  deductibleDiscount: number | undefined; // computed
+ promoDiscount: number | undefined; // computed
+ multiPolicyDiscount: number | undefined; // computed
+  totalPremium: number | undefined; // computed
+  installmentAmount: number | undefined; // computed
   agreePersonalData: boolean;
- agreeTerms: boolean;
+  agreeTerms: boolean;
   agreeElectronicPolicy: boolean;
   agreeMarketing: boolean;
   confirmAccuracy: boolean;

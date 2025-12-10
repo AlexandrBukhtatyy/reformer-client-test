@@ -4,7 +4,11 @@
 
 ## Предусловия
 
-1. MCP сервер reformer должен быть зарегистрирован
+1. MCP сервер reformer должен быть зарегистрирован:
+
+   ```bash
+   claude mcp add --transport stdio reformer -- npx @reformer/mcp
+   ```
 
 2. Проект должен иметь установленные зависимости:
    ```bash
@@ -67,6 +71,23 @@
 - complex: многошаговая форма, вложенные объекты, массивы
 ```
 
+**Ожидаемая структура для complex формы:**
+
+```
+src/features/insurance-application-form/
+├── types.ts                 # TypeScript интерфейсы
+├── schema.ts                # createForm + FormSchema
+├── validation.ts            # ValidationSchemaFn (или validation/ для шагов)
+├── behaviors.ts             # BehaviorSchemaFn (опционально)
+├── components/
+│   ├── [FormName]Form.tsx   # Главный компонент формы
+│   └── steps/               # Компоненты шагов (для пошаговых форм)
+│       ├── Step1.tsx
+│       ├── Step2.tsx
+│       └── ...
+└── hooks/                   # Кастомные хуки (опционально)
+```
+
 ---
 
 ### Шаг 3: Генерация TypeScript типов
@@ -84,19 +105,6 @@
 
 ```typescript
 // types.ts
-export interface PersonalData {
-  lastName: string;
-  firstName: string;
-  middleName: string;
-  birthDate: string;
-}
-
-export interface Driver {
-  lastName: string;
-  firstName: string;
-  licenseNumber: string;
-}
-
 export interface InsuranceForm {
   // Шаг 1: Тип страхования
   insuranceType: "casco" | "osago" | "property" | "life" | "travel";
@@ -111,6 +119,19 @@ export interface InsuranceForm {
 
   // Массив
   drivers: Driver[];
+}
+
+export interface PersonalData {
+  lastName: string;
+  firstName: string;
+  middleName: string;
+  birthDate: string;
+}
+
+export interface Driver {
+  lastName: string;
+  firstName: string;
+  licenseNumber: string;
 }
 ```
 
@@ -127,17 +148,139 @@ export interface InsuranceForm {
 - Для пустых строк используй `''`
 - Указывай `component` для каждого поля
 
+**Пример:**
+
+```typescript
+// schema.ts
+import { createForm, type FormSchemaFn } from "@reformer/core";
+import type { InsuranceForm } from "./types";
+import { validation } from "./validation";
+import { behaviors } from "./behaviors";
+
+const formSchema: FormSchemaFn<InsuranceForm> = () => ({
+  insuranceType: {
+    value: "casco",
+    component: "select",
+    label: "Тип страхования",
+  },
+  coverageAmount: {
+    value: null, // null для пустых чисел
+    component: "input",
+    label: "Страховая сумма",
+  },
+  personalData: {
+    lastName: {
+      value: "",
+      component: "input",
+      label: "Фамилия",
+    },
+    // ...
+  },
+  drivers: [
+    {
+      lastName: { value: "", component: "input", label: "Фамилия" },
+      firstName: { value: "", component: "input", label: "Имя" },
+      licenseNumber: { value: "", component: "input", label: "Номер ВУ" },
+    },
+  ],
+});
+
+export const form = createForm<InsuranceForm>({
+  form: formSchema,
+  validation,
+  behavior: behaviors,
+});
+```
+
 ---
 
 ### Шаг 5: Генерация валидации
 
 Используй MCP инструмент `generate_validation` для получения списка валидаторов.
 
+**Для пошаговой формы создай отдельные схемы:**
+
+```typescript
+// validation.ts
+import type { ValidationSchemaFn } from "@reformer/core";
+import { required, min, max, email, pattern } from "@reformer/core/validators";
+import type { InsuranceForm } from "./types";
+
+// Валидация шага 1
+export const step1Validation: ValidationSchemaFn<InsuranceForm> = (path) => {
+  required(path.insuranceType, { message: "Выберите тип страхования" });
+  required(path.startDate, { message: "Укажите дату начала" });
+  required(path.coverageAmount, { message: "Укажите страховую сумму" });
+  min(path.coverageAmount, 100000, { message: "Минимум 100 000 ₽" });
+  max(path.coverageAmount, 50000000, { message: "Максимум 50 000 000 ₽" });
+};
+
+// Валидация шага 2
+export const step2Validation: ValidationSchemaFn<InsuranceForm> = (path) => {
+  required(path.personalData.lastName, { message: "Укажите фамилию" });
+  required(path.personalData.firstName, { message: "Укажите имя" });
+  required(path.personalData.birthDate, { message: "Укажите дату рождения" });
+};
+
+// Карта валидаций для useStepForm
+export const STEP_VALIDATIONS: Record<
+  number,
+  ValidationSchemaFn<InsuranceForm>
+> = {
+  1: step1Validation,
+  2: step2Validation,
+  // ...
+};
+
+// Полная валидация (для финальной отправки)
+export const validation: ValidationSchemaFn<InsuranceForm> = (path) => {
+  step1Validation(path);
+  step2Validation(path);
+};
+```
+
 ---
 
 ### Шаг 6: Генерация поведений
 
 Используй MCP инструмент `generate_behavior` для получения списка поведений.
+
+**Пример:**
+
+```typescript
+// behaviors.ts
+import type { BehaviorSchemaFn } from "@reformer/core";
+import { computeFrom, visibleWhen, watchField } from "@reformer/core/behaviors";
+import type { InsuranceForm } from "./types";
+
+export const behaviors: BehaviorSchemaFn<InsuranceForm> = (path) => {
+  // Вычисляемое поле: дата окончания
+  computeFrom(
+    path.endDate,
+    [path.startDate, path.insurancePeriod],
+    ([startDate, period]) => {
+      if (!startDate) return "";
+      const date = new Date(startDate);
+      date.setMonth(date.getMonth() + period);
+      return date.toISOString().split("T")[0];
+    }
+  );
+
+  // Условная видимость: рассрочка
+  visibleWhen(
+    path.installments,
+    path.paymentType,
+    (paymentType) => paymentType === "installments"
+  );
+
+  // Сброс при изменении типа страхования
+  watchField(path.insuranceType, (value, form) => {
+    // Сброс специфичных полей при смене типа
+    form.get(path.vehicleData)?.reset();
+    form.get(path.propertyData)?.reset();
+  });
+};
+```
 
 ---
 
@@ -165,15 +308,28 @@ import { useMemo } from "react";
 import { useStepForm } from "@reformer/react";
 import { createInsuranceForm } from "../schema";
 import { STEP_VALIDATIONS } from "../validation";
-import { Step1Component, Step2Component } from "./steps";
+import { Step1, Step2, Step3 } from "./steps";
+
+const STEPS = [Step1, Step2, Step3];
 
 export function InsuranceForm() {
   const form = useMemo(() => createInsuranceForm(), []);
-  const navRef = useRef<StepNavigationHandle<MyForm>>(null);
+
+  const {
+    currentStep,
+    nextStep,
+    prevStep,
+    isFirstStep,
+    isLastStep,
+    validateCurrentStep,
+  } = useStepForm(form, {
+    stepSchemas: STEP_VALIDATIONS,
+    totalSteps: STEPS.length,
+  });
 
   const handleNext = async () => {
     const isValid = await validateCurrentStep();
-    if (isValid) navRef.current?.goToNextStep();
+    if (isValid) nextStep();
   };
 
   const handleSubmit = async () => {
@@ -183,18 +339,13 @@ export function InsuranceForm() {
     }
   };
 
+  const StepComponent = STEPS[currentStep - 1];
+
   return (
     <div>
       <StepIndicator current={currentStep} total={STEPS.length} />
 
-      <StepNavigation ref={navRef} form={form} config={config}>
-        {(currentStep) => (
-          <>
-            {currentStep === 1 && <Step1Component control={form} />}
-            {currentStep === 2 && <Step2Component control={form} />}
-          </>
-        )}
-      </StepNavigation>
+      <StepComponent control={form.controls} />
 
       <div className="flex gap-2 mt-4">
         {!isFirstStep && <Button onClick={prevStep}>Назад</Button>}
@@ -209,11 +360,13 @@ export function InsuranceForm() {
 }
 ```
 
-**Компонент шага или переиспользуемой формы:**
+**Компонент шага:**
 
 ```typescript
 // components/steps/Step1.tsx
-// imports
+import { useFormControl } from "@reformer/react";
+import type { GroupNodeWithControls } from "@reformer/core";
+import type { InsuranceForm } from "../../types";
 
 interface StepProps {
   control: GroupNodeWithControls<InsuranceForm>;
@@ -223,9 +376,23 @@ export function Step1({ control }: StepProps) {
   return (
     <div className="space-y-4">
       <h2>Шаг 1: Тип страхования</h2>
-      <FormField control={control.insuranceType} />
-      <FormField control={control.startDate} />
-      <FormField control={control.coverageAmount} />
+
+      <FormField
+        control={control.insuranceType}
+        label="Тип страхования"
+        options={[
+          { value: "casco", label: "КАСКО" },
+          { value: "osago", label: "ОСАГО" },
+        ]}
+      />
+
+      <FormField control={control.startDate} label="Дата начала" type="date" />
+
+      <FormField
+        control={control.coverageAmount}
+        label="Страховая сумма"
+        type="number"
+      />
     </div>
   );
 }
@@ -243,7 +410,6 @@ export function Step1({ control }: StepProps) {
 - [ ] Компоненты используют `useFormControl` / `useFormControlValue`
 - [ ] Пошаговая навигация работает с валидацией
 - [ ] Форма создается через `useMemo` в компоненте
-- [ ] Отсутствуют ошибки компиляции
 
 ---
 
@@ -275,7 +441,6 @@ export function Step1({ control }: StepProps) {
 4. Генерации валидации (generate_validation)
 5. Генерации поведений (generate_behavior)
 6. Проверки кода (check_code)
-7. Проверки компиляции кода (npm run build)
 
 Форма должна:
 - Быть пошаговой (6 шагов)
@@ -283,5 +448,4 @@ export function Step1({ control }: StepProps) {
 - Использовать useStepForm для навигации
 - Поддерживать вычисляемые поля (endDate, age, experience)
 - Иметь условную видимость полей
-- Компилироваться без ошибок
 ```

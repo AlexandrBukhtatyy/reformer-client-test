@@ -1,9 +1,9 @@
-import { InsuranceApplicationForm } from "./forms/insurance-application/insurance-application-form"
+import { InsuranceForm } from "./features/insurance-application-form/components/InsuranceForm"
 
 function App() {
   return (
     <div className="flex min-h-svh flex-col items-center py-6">
-      <InsuranceApplicationForm />
+      <InsuranceForm/>
     </div>
   )
 }
