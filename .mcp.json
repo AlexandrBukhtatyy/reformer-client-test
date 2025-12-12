@@ -3,7 +3,7 @@
     "reformer-mcp": {
       "command": "node",
       "args": [
-        "/Users/aleksandrbuhtatyj/Work/My/ReFormer/packages/reformer-mcp/dist/index.js"
+        "D:/Work/ReFormer/packages/reformer-mcp/dist/index.js"
       ]
     },
     "playwright": {

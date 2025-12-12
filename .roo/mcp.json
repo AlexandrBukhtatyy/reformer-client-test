@@ -1,14 +1,1 @@
-{
-  "mcpServers": {
-    "reformer-mcp": {
-      "command": "node",
-      "args": [
-        "D:\\Work\\ReFormer\\packages\\reformer-mcp\\dist\\index.js"
-      ]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest"]
-    }
-  }
-}
+{"mcpServers":{"reformer-mcp":{"command":"node","args":["D:\\Work\\ReFormer\\packages\\reformer-mcp\\dist\\index.js"]},"playwright":{"command":"npx","args":["@playwright/mcp@latest"],"disabled":false,"alwaysAllow":[]}}}
