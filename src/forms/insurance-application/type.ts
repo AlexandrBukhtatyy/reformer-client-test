@@ -170,7 +170,7 @@ export interface Claim {
 export interface InsuranceApplicationForm {
   // Step 1: Insurance Type and Basic Parameters
   insuranceType: InsuranceType;
-  insurancePeriod: number;
+  insurancePeriod: string;
   startDate: string;
   endDate: string; // computed
   coverageAmount: number | undefined;

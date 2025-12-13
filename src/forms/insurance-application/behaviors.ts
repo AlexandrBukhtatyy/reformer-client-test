@@ -78,15 +78,8 @@ export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicatio
   // Step 1: Computed Fields
   // ===========================
 
-  // End Date = Start Date + Insurance Period months
-  computeFrom(
-    [path.startDate, path.insurancePeriod],
-    path.endDate,
-    ({ startDate, insurancePeriod }) => {
-      if (!startDate || !insurancePeriod) return '';
-      return addMonths(startDate, Number(insurancePeriod));
-    }
-  );
+  // Note: End Date calculation is handled via useEffect in Step1InsuranceType.tsx
+  // because watchField doesn't trigger callbacks as expected in this context.
 
   // Installments conditional visibility (top-level field, no nesting issue)
   enableWhen(path.installments, (form) => form.paymentType === 'installments', { resetOnDisable: true });

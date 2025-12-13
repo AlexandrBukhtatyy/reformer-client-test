@@ -1,8 +1,17 @@
 // Step 1: Insurance Type and Basic Parameters
+import { useEffect } from 'react';
 import type { GroupNodeWithControls } from '@reformer/core';
 import { useFormControlValue } from '@reformer/core';
 import { FormField } from '@/components/ui/FormField';
 import type { InsuranceApplicationForm } from '../type';
+
+// Helper to add months to date
+const addMonths = (dateStr: string, months: number): string => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  date.setMonth(date.getMonth() + months);
+  return date.toISOString().split('T')[0];
+};
 
 interface Step1Props {
   control: GroupNodeWithControls<InsuranceApplicationForm>;
@@ -10,6 +19,18 @@ interface Step1Props {
 
 export function Step1InsuranceType({ control }: Step1Props) {
   const paymentType = useFormControlValue(control.paymentType);
+  const startDate = useFormControlValue(control.startDate);
+  const insurancePeriod = useFormControlValue(control.insurancePeriod);
+
+  // Calculate endDate when startDate or insurancePeriod changes
+  useEffect(() => {
+    if (startDate && insurancePeriod) {
+      const endDate = addMonths(startDate, Number(insurancePeriod));
+      control.endDate.setValue(endDate);
+    } else {
+      control.endDate.setValue('');
+    }
+  }, [startDate, insurancePeriod, control.endDate]);
 
   return (
     <div className="space-y-6">

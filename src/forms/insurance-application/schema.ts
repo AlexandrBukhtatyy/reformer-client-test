@@ -17,11 +17,11 @@ export const insuranceTypeOptions = [
 ];
 
 export const insurancePeriodOptions = [
-  { value: 3, label: '3 месяца' },
-  { value: 6, label: '6 месяцев' },
-  { value: 12, label: '1 год' },
-  { value: 24, label: '2 года' },
-  { value: 36, label: '3 года' },
+  { value: '3', label: '3 месяца' },
+  { value: '6', label: '6 месяцев' },
+  { value: '12', label: '1 год' },
+  { value: '24', label: '2 года' },
+  { value: '36', label: '3 года' },
 ];
 
 export const paymentTypeOptions = [
@@ -182,7 +182,7 @@ const claimSchema: FormSchema<Claim> = {
 export const insuranceApplicationSchema: FormSchema<InsuranceApplicationForm> = {
   // Step 1: Insurance Type and Basic Parameters
   insuranceType: { value: 'casco', component: Select, componentProps: { label: 'Тип страхования', options: insuranceTypeOptions, placeholder: 'Выберите тип страхования', testId: 'insuranceType' } },
-  insurancePeriod: { value: 12, component: Select, componentProps: { label: 'Срок страхования', options: insurancePeriodOptions, placeholder: 'Выберите срок', testId: 'insurancePeriod' } },
+  insurancePeriod: { value: '', component: Select, componentProps: { label: 'Срок страхования', options: insurancePeriodOptions, placeholder: 'Выберите срок', testId: 'insurancePeriod' } },
   startDate: { value: '', component: Input, componentProps: { label: 'Дата начала действия полиса', type: 'date', testId: 'startDate' } },
   endDate: { value: '', component: Input, componentProps: { label: 'Дата окончания', type: 'date', disabled: true, testId: 'endDate' } },
   coverageAmount: { value: undefined, component: Input, componentProps: { label: 'Страховая сумма (руб.)', type: 'number', min: 100000, max: 50000000, placeholder: 'от 100 000 до 50 000 000', testId: 'coverageAmount' } },
