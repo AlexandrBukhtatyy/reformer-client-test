@@ -8,11 +8,13 @@ interface Step6FormProps {
 }
 
 export function Step6Form({ control }: Step6FormProps) {
-  const agreePersonalData = useFormControlValue(control.agreePersonalData);
-  const agreeTerms = useFormControlValue(control.agreeTerms);
-  const agreeElectronicPolicy = useFormControlValue(control.agreeElectronicPolicy);
-  const agreeMarketing = useFormControlValue(control.agreeMarketing);
-  const confirmAccuracy = useFormControlValue(control.confirmAccuracy);
+  const agreePersonalData = useFormControlValue(control?.agreePersonalData);
+  const agreeTerms = useFormControlValue(control?.agreeTerms);
+  const agreeElectronicPolicy = useFormControlValue(control?.agreeElectronicPolicy);
+  const agreeMarketing = useFormControlValue(control?.agreeMarketing);
+  const confirmAccuracy = useFormControlValue(control?.confirmAccuracy);
+
+  if (!control) return null;
 
   return (
     <div className="space-y-6">

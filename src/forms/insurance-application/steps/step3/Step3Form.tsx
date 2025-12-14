@@ -8,7 +8,10 @@ interface Step3FormProps {
 }
 
 export function Step3Form({ control }: Step3FormProps) {
-  const insuranceType = useFormControlValue(control.insuranceType);
+  const insuranceType = useFormControlValue(control?.insuranceType);
+
+  if (!control) return null;
+
   return (
     <div className="space-y-6">
       <div>

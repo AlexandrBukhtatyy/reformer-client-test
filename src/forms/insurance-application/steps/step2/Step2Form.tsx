@@ -8,7 +8,9 @@ interface Step2FormProps {
 }
 
 export function Step2Form({ control }: Step2FormProps) {
-  const insuredType = useFormControlValue(control.insuredType);
+  const insuredType = useFormControlValue(control?.insuredType);
+
+  if (!control) return null;
 
   return (
     <div className="space-y-6">

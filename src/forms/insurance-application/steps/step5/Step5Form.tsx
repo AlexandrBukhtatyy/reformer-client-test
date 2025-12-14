@@ -9,8 +9,10 @@ interface Step5FormProps {
 }
 
 export function Step5Form({ control }: Step5FormProps) {
-  const hasPreviousInsurance = useFormControlValue(control.hasPreviousInsurance);
-  const hadClaims = useFormControlValue(control.hadClaims);
+  const hasPreviousInsurance = useFormControlValue(control?.hasPreviousInsurance);
+  const hadClaims = useFormControlValue(control?.hadClaims);
+
+  if (!control) return null;
 
   return (
     <div className="space-y-6">

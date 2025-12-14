@@ -8,7 +8,9 @@ interface Step1FormProps {
 }
 
 export function Step1Form({ control }: Step1FormProps) {
-  const paymentTypeValue = useFormControlValue(control.paymentType!);
+  const paymentTypeValue = useFormControlValue(control?.paymentType);
+
+  if (!control) return null;
 
   return (
     <div className="space-y-6">

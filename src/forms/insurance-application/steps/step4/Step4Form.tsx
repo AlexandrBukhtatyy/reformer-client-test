@@ -10,7 +10,9 @@ interface Step4FormProps {
 
 export function Step4Form({ control }: Step4FormProps) {
   const insuranceType = useFormControlValue(control?.insuranceType);
-  const unlimitedDrivers = useFormControlValue(control.unlimitedDrivers);
+  const unlimitedDrivers = useFormControlValue(control?.unlimitedDrivers);
+
+  if (!control) return null;
 
   return (
     <div className="space-y-6">
