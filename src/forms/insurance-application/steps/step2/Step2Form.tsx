@@ -1,10 +1,10 @@
 import { useFormControlValue } from '@reformer/core';
 import { FormField } from '@/components/ui';
 import type { GroupNodeWithControls } from '@reformer/core';
-import type { Step2Form } from './type';
+import type { InsuranceApplicationForm } from '../../type';
 
 interface Step2FormProps {
-  form: GroupNodeWithControls<Step2Form>;
+  form: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
 export function Step2Form({ form }: Step2FormProps) {
@@ -22,25 +22,25 @@ export function Step2Form({ form }: Step2FormProps) {
       {insuredType === 'individual' && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormField control={form.personalData.lastName} />
-            <FormField control={form.personalData.firstName} />
-            <FormField control={form.personalData.middleName} />
+            <FormField control={form.personalData!.lastName} />
+            <FormField control={form.personalData!.firstName} />
+            <FormField control={form.personalData!.middleName} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={form.personalData.birthDate} />
-            <FormField control={form.personalData.gender} />
+            <FormField control={form.personalData!.birthDate} />
+            <FormField control={form.personalData!.gender} />
           </div>
 
           <div className="space-y-4">
             <h3 className="font-medium">Паспортные данные</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField control={form.passportData.series} />
-              <FormField control={form.passportData.number} />
+              <FormField control={form.passportData!.series} />
+              <FormField control={form.passportData!.number} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField control={form.passportData.issueDate} />
-              <FormField control={form.passportData.issuedBy} />
+              <FormField control={form.passportData!.issueDate} />
+              <FormField control={form.passportData!.issuedBy} />
             </div>
           </div>
         </div>
@@ -48,14 +48,14 @@ export function Step2Form({ form }: Step2FormProps) {
 
       {insuredType === 'company' && (
         <div className="space-y-4">
-          <FormField control={form.companyData.name} />
+          <FormField control={form.companyData!.name} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={form.companyData.inn} />
-            <FormField control={form.companyData.ogrn} />
+            <FormField control={form.companyData!.inn} />
+            <FormField control={form.companyData!.ogrn} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={form.companyData.kpp} />
-            <FormField control={form.companyData.ceoName} />
+            <FormField control={form.companyData!.kpp} />
+            <FormField control={form.companyData!.ceoName} />
           </div>
         </div>
       )}

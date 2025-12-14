@@ -1,13 +1,14 @@
+import { useFormControlValue } from '@reformer/core';
 import { FormField } from '@/components/ui';
 import type { GroupNodeWithControls } from '@reformer/core';
-import type { Step3Form } from './type';
+import type { InsuranceApplicationForm } from '../../type';
 
 interface Step3FormProps {
-  form: GroupNodeWithControls<Step3Form>;
-  insuranceType: 'casco' | 'osago' | 'property' | 'life' | 'travel';
+  form: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
-export function Step3Form({ form, insuranceType }: Step3FormProps) {
+export function Step3Form({ form }: Step3FormProps) {
+  const insuranceType = useFormControlValue(form.insuranceType);
   return (
     <div className="space-y-6">
       <div>
@@ -46,7 +47,7 @@ export function Step3Form({ form, insuranceType }: Step3FormProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <FormField control={form.vehicle!.hasAntiTheft} />
-              {form.vehicle?.hasAntiTheft.value && (
+              {form.vehicle?.hasAntiTheft.value.value && (
                 <FormField control={form.vehicle!.antiTheftBrand} />
               )}
             </div>
@@ -81,7 +82,7 @@ export function Step3Form({ form, insuranceType }: Step3FormProps) {
             <FormField control={form.property!.floors} />
           </div>
 
-          {form.property?.type.value === 'apartment' && (
+          {form.property?.type.value.value === 'apartment' && (
             <FormField control={form.property!.floor} />
           )}
 
@@ -131,21 +132,21 @@ export function Step3Form({ form, insuranceType }: Step3FormProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <FormField control={form.health!.isSmoker} />
-              {form.health?.isSmoker.value && (
+              {form.health?.isSmoker.value.value && (
                 <FormField control={form.health!.smokingYears} />
               )}
             </div>
 
             <div className="flex items-center gap-4">
               <FormField control={form.health!.hasChronicDiseases} />
-              {form.health?.hasChronicDiseases.value && (
+              {form.health?.hasChronicDiseases.value.value && (
                 <FormField control={form.health!.chronicDiseases} />
               )}
             </div>
 
             <div className="flex items-center gap-4">
               <FormField control={form.health!.hadSurgeries} />
-              {form.health?.hadSurgeries.value && (
+              {form.health?.hadSurgeries.value.value && (
                 <FormField control={form.health!.surgeries} />
               )}
             </div>
@@ -154,7 +155,7 @@ export function Step3Form({ form, insuranceType }: Step3FormProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <FormField control={form.health!.practicesSports} />
-              {form.health?.practicesSports.value && (
+              {form.health?.practicesSports.value.value && (
                 <FormField control={form.health!.extremeSports} />
               )}
             </div>

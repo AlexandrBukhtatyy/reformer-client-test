@@ -1,5 +1,4 @@
 export interface Step5Form {
-  // Previous insurance history
   hasPreviousInsurance: boolean;
   previousInsurer: string;
   previousPolicyNumber: string;
@@ -12,8 +11,6 @@ export interface Step5Form {
     amount: number | undefined;
     atFault: boolean;
   }>;
-
-  // Additional information
   promoCode: string;
   referralSource: 'internet' | 'friends' | 'tv' | 'agent' | 'other';
   agentCode: string;

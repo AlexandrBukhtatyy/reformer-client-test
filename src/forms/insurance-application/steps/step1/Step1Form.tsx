@@ -1,14 +1,14 @@
 import { useFormControlValue } from '@reformer/core';
 import { FormField } from '@/components/ui';
 import type { GroupNodeWithControls } from '@reformer/core';
-import type { Step1Form } from './type';
+import type { InsuranceApplicationForm } from '../../type';
 
 interface Step1FormProps {
-  form: GroupNodeWithControls<Step1Form>;
+  form: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
 export function Step1Form({ form }: Step1FormProps) {
-  const paymentTypeValue = useFormControlValue(form.paymentType);
+  const paymentTypeValue = useFormControlValue(form.paymentType!);
 
   return (
     <div className="space-y-6">

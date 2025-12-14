@@ -4,6 +4,8 @@ import { Step1Form } from './steps/step1/Step1Form';
 import { Step2Form } from './steps/step2/Step2Form';
 import { Step3Form } from './steps/step3/Step3Form';
 import { Step4Form } from './steps/step4/Step4Form';
+import { Step5Form } from './steps/step5/Step5Form';
+import { Step6Form } from './steps/step6/Step6Form';
 import { insuranceApplicationSchema } from './formSchema';
 import { insuranceApplicationValidation } from './formValidators';
 import { insuranceApplicationBehavior } from './formBehaviors';
@@ -120,22 +122,12 @@ export function InsuranceApplicationForm({
 
       {/* Step content */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        {currentStep === 0 && <Step1Form form={form.step1} />}
-        {currentStep === 1 && <Step2Form form={form.step2} />}
-        {currentStep === 2 && (
-          <Step3Form 
-            form={form.step3} 
-            insuranceType={form.step1.insuranceType.value.value} 
-          />
-        )}
-        {currentStep === 3 && (
-          <Step4Form 
-            form={form.step4} 
-            insuranceType={form.step1.insuranceType.value.value} 
-          />
-        )}
-        {currentStep === 4 && <div>Шаг 5: История и дополнительная информация</div>}
-        {currentStep === 5 && <div>Шаг 6: Расчет и подтверждение</div>}
+        {currentStep === 0 && <Step1Form form={form} />}
+        {currentStep === 1 && <Step2Form form={form} />}
+        {currentStep === 2 && <Step3Form form={form} />}
+        {currentStep === 3 && <Step4Form form={form} />}
+        {currentStep === 4 && <Step5Form form={form} />}
+        {currentStep === 5 && <Step6Form form={form} />}
       </div>
 
       {/* Navigation buttons */}

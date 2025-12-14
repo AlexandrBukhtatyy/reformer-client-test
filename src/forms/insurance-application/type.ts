@@ -1,22 +1,22 @@
 export interface InsuranceApplicationForm {
   // Step 1: Insurance Type and Parameters
-  insuranceType: 'casco' | 'osago' | 'property' | 'life' | 'travel';
+  insuranceType: "casco" | "osago" | "property" | "life" | "travel";
   insurancePeriod: 3 | 6 | 12 | 24 | 36;
   startDate: string; // date string
   endDate: string; // computed
   coverageAmount: number | undefined;
   deductible: number | undefined;
-  paymentType: 'single' | 'installments';
+  paymentType: "single" | "installments";
   installments: 2 | 3 | 4 | 6 | 12 | undefined;
 
   // Step 2: Insured Data
-  insuredType: 'individual' | 'company';
+  insuredType: "individual" | "company";
   personalData: {
     lastName: string;
     firstName: string;
     middleName: string;
     birthDate: string; // date string
-    gender: 'male' | 'female';
+    gender: "male" | "female";
   };
   companyData: {
     name: string;
@@ -34,7 +34,7 @@ export interface InsuranceApplicationForm {
   phone: string;
   email: string;
   fullName: string; // computed
- age: number | undefined; // computed
+  age: number | undefined; // computed
 
   // Step 3: Insurance Object - Vehicle (casco/osago)
   vehicle?: {
@@ -44,20 +44,27 @@ export interface InsuranceApplicationForm {
     year: number | undefined;
     mileage: number | undefined;
     enginePower: number | undefined;
-    bodyType: 'sedan' | 'hatchback' | 'suv' | 'wagon' | 'coupe' | 'minivan' | 'pickup';
-    transmission: 'manual' | 'automatic';
+    bodyType:
+      | "sedan"
+      | "hatchback"
+      | "suv"
+      | "wagon"
+      | "coupe"
+      | "minivan"
+      | "pickup";
+    transmission: "manual" | "automatic";
     marketValue: number | undefined;
     licensePlate: string;
     registrationCert: string;
     hasAntiTheft: boolean;
     antiTheftBrand: string;
     garageParking: boolean;
-    usagePurpose: 'personal' | 'taxi' | 'training' | 'commercial';
+    usagePurpose: "personal" | "taxi" | "training" | "commercial";
   };
 
   // Step 3: Insurance Object - Property
   property?: {
-    type: 'apartment' | 'house' | 'townhouse' | 'commercial' | 'land';
+    type: "apartment" | "house" | "townhouse" | "commercial" | "land";
     address: {
       region: string;
       city: string;
@@ -69,7 +76,13 @@ export interface InsuranceApplicationForm {
     floors: number | undefined;
     floor: number | undefined;
     yearBuilt: number | undefined;
-    wallMaterial: 'brick' | 'concrete' | 'wood' | 'panel' | 'monolithic' | 'other';
+    wallMaterial:
+      | "brick"
+      | "concrete"
+      | "wood"
+      | "panel"
+      | "monolithic"
+      | "other";
     marketValue: number | undefined;
     hasAlarm: boolean;
     hasFireAlarm: boolean;
@@ -96,8 +109,8 @@ export interface InsuranceApplicationForm {
 
   // Step 3: Insurance Object - Travel
   travel?: {
-    destination: 'europe' | 'asia' | 'usa' | 'cis' | 'worldwide';
-    tripPurpose: 'tourism' | 'business' | 'study' | 'work' | 'other';
+    destination: "europe" | "asia" | "usa" | "cis" | "worldwide";
+    tripPurpose: "tourism" | "business" | "study" | "work" | "other";
     departureDate: string; // date string
     returnDate: string; // date string
     tripDuration: number | undefined; // computed
@@ -143,10 +156,10 @@ export interface InsuranceApplicationForm {
   beneficiaries?: Array<{
     fullName: string;
     birthDate: string; // date string
-    relationship: 'spouse' | 'child' | 'parent' | 'sibling' | 'other';
+    relationship: "spouse" | "child" | "parent" | "sibling" | "other";
     share: number | undefined;
     phone: string;
- }>;
+  }>;
   totalBeneficiaryShare: number | undefined; // computed
 
   // Step 4: Travelers (travel)
@@ -164,31 +177,36 @@ export interface InsuranceApplicationForm {
   hadClaims: boolean;
   claims?: Array<{
     date: string; // date string
-    type: 'accident' | 'theft' | 'damage' | 'disaster' | 'medical' | 'other';
+    type: "accident" | "theft" | "damage" | "disaster" | "medical" | "other";
     description: string;
     amount: number | undefined;
     atFault: boolean;
   }>;
   promoCode: string;
-  referralSource: 'internet' | 'friends' | 'tv' | 'agent' | 'other';
- agentCode: string;
+  referralSource: "internet" | "friends" | "tv" | "agent" | "other";
+  agentCode: string;
   additionalNotes: string;
 
   // Step 6: Calculation and Confirmation
- basePremium: number | undefined; // computed
+  basePremium: number | undefined; // computed
   ageCoefficient: number | undefined; // computed
   experienceCoefficient: number | undefined; // computed
- regionCoefficient: number | undefined; // computed
+  regionCoefficient: number | undefined; // computed
   claimsCoefficient: number | undefined; // computed
- deductibleDiscount: number | undefined; // computed
- promoDiscount: number | undefined; // computed
- multiPolicyDiscount: number | undefined; // computed
+  deductibleDiscount: number | undefined; // computed
+  promoDiscount: number | undefined; // computed
+  multiPolicyDiscount: number | undefined; // computed
   totalPremium: number | undefined; // computed
   installmentAmount: number | undefined; // computed
- agreePersonalData: boolean;
+  agreePersonalData: boolean;
   agreeTerms: boolean;
   agreeElectronicPolicy: boolean;
- agreeMarketing: boolean;
+  agreeMarketing: boolean;
   confirmAccuracy: boolean;
   electronicSignature: string;
+
+  // Policy data (step 6)
+  policyNumber: string;
+  policyStartDate: string; // date string
+  policyEndDate: string; // date string
 }

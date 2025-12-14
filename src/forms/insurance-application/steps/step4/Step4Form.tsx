@@ -1,14 +1,15 @@
 import { useFormControlValue } from '@reformer/core';
 import { FormField } from '@/components/ui';
+import { FormArray } from '@reformer/ui/form-array';
 import type { GroupNodeWithControls } from '@reformer/core';
-import type { Step4Form } from './type';
+import type { InsuranceApplicationForm } from '../../type';
 
 interface Step4FormProps {
-  form: GroupNodeWithControls<Step4Form>;
-  insuranceType: 'casco' | 'osago' | 'property' | 'life' | 'travel';
+  form: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
-export function Step4Form({ form, insuranceType }: Step4FormProps) {
+export function Step4Form({ form }: Step4FormProps) {
+  const insuranceType = useFormControlValue(form?.insuranceType);
   const unlimitedDrivers = useFormControlValue(form.unlimitedDrivers);
 
   return (
@@ -28,186 +29,156 @@ export function Step4Form({ form, insuranceType }: Step4FormProps) {
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <FormField control={form.unlimitedDrivers} />
-            {form.unlimitedDrivers.value && (
-              <span className="text-sm text-gray-500">Будет разрешено неограниченное количество водителей</span>
+            {form.unlimitedDrivers.value.value && (
+              <span className="text-sm text-gray-50">Будет разрешено неограниченное количество водителей</span>
             )}
           </div>
 
           {!unlimitedDrivers && (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="font-medium">Водители</h3>
-                <button
-                  type="button"
-                  className="text-blue-600 hover:text-blue-800 text-sm"
-                  onClick={() => form.drivers?.push({ 
-                    fullName: '', 
-                    birthDate: '', 
-                    licenseNumber: '', 
-                    licenseIssueDate: '', 
-                    drivingExperience: undefined, 
-                    accidentsCount: 0, 
-                    isMainDriver: false 
-                  })}
-                >
-                  + Добавить водителя
-                </button>
-              </div>
+            <FormArray.Root control={form.drivers}>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-medium">Водители</h3>
+                  <FormArray.AddButton className="text-blue-600 hover:text-blue-800 text-sm">
+                    + Добавить водителя
+                  </FormArray.AddButton>
+                </div>
 
-              {form.drivers && form.drivers.length > 0 && (
-                <div className="space-y-4">
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {(form.drivers as any)?.map((driver: any, index: number) => (
-                    <div key={driver.id} className="border rounded-lg p-4 space-y-4">
+                <FormArray.Empty>
+                  <p className="text-sm text-gray-500">Нет добавленных водителей</p>
+                </FormArray.Empty>
+
+                <FormArray.List>
+                  {({ control, index, remove }) => (
+                    <div key={control.id} className="border rounded-lg p-4 space-y-4">
                       <div className="flex justify-between items-center">
                         <h4 className="font-medium">Водитель #{index + 1}</h4>
                         <button
                           type="button"
                           className="text-red-600 hover:text-red-800 text-sm"
-                          onClick={() => {
-                            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                            (form.drivers as any)?.removeAt(index);
-                          }}
+                          onClick={remove}
                         >
                           Удалить
                         </button>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField control={driver.fullName} />
-                        <FormField control={driver.birthDate} />
+                        <FormField control={control.fullName} />
+                        <FormField control={control.birthDate} />
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField control={driver.licenseNumber} />
-                        <FormField control={driver.licenseIssueDate} />
+                        <FormField control={control.licenseNumber} />
+                        <FormField control={control.licenseIssueDate} />
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField control={driver.drivingExperience} />
-                        <FormField control={driver.accidentsCount} />
-                        <FormField control={driver.isMainDriver} />
+                        <FormField control={control.drivingExperience} />
+                        <FormField control={control.accidentsCount} />
+                        <FormField control={control.isMainDriver} />
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField control={form.minDriverAge} />
-                <FormField control={form.minDriverExperience} />
+                  )}
+                </FormArray.List>
               </div>
-            </div>
+            </FormArray.Root>
           )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField control={form.minDriverAge} />
+            <FormField control={form.minDriverExperience} />
+          </div>
         </div>
       ) : insuranceType === 'life' ? (
         <div className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-medium">Выгодоприобретатели</h3>
-              <button
-                type="button"
-                className="text-blue-600 hover:text-blue-800 text-sm"
-                onClick={() => form.beneficiaries?.push({ 
-                  fullName: '', 
-                  birthDate: '', 
-                  relationship: 'spouse', 
-                  share: undefined, 
-                  phone: '' 
-                })}
-              >
-                + Добавить выгодоприобретателя
-              </button>
-            </div>
-
-            {form.beneficiaries && form.beneficiaries.length > 0 && (
-              <div className="space-y-4">
-               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-               {(form.beneficiaries as any)?.map((beneficiary: any, index: number) => (
-                 <div key={beneficiary.id} className="border rounded-lg p-4 space-y-4">
-                   <div className="flex justify-between items-center">
-                     <h4 className="font-medium">Выгодоприобретатель #{index + 1}</h4>
-                     <button
-                       type="button"
-                       className="text-red-600 hover:text-red-800 text-sm"
-                       onClick={() => {
-                         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                         (form.beneficiaries as any)?.removeAt(index);
-                       }}
-                     >
-                       Удалить
-                     </button>
-                   </div>
-
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <FormField control={beneficiary.fullName} />
-                     <FormField control={beneficiary.birthDate} />
-                   </div>
-
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <FormField control={beneficiary.relationship} />
-                     <FormField control={beneficiary.share} />
-                   </div>
-
-                   <FormField control={beneficiary.phone} />
-                 </div>
-               ))}
+          <FormArray.Root control={form.beneficiaries}>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="font-medium">Выгодоприобретатели</h3>
+                <FormArray.AddButton className="text-blue-600 hover:text-blue-80 text-sm">
+                  + Добавить выгодоприобретателя
+                </FormArray.AddButton>
               </div>
-            )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField control={form.totalBeneficiaryShare} />
+              <FormArray.Empty>
+                <p className="text-sm text-gray-500">Нет добавленных выгодоприобретателей</p>
+              </FormArray.Empty>
+
+              <FormArray.List>
+                {({ control, index, remove }) => (
+                  <div key={control.id} className="border rounded-lg p-4 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium">Выгодоприобретатель #{index + 1}</h4>
+                      <button
+                        type="button"
+                        className="text-red-600 hover:text-red-800 text-sm"
+                        onClick={remove}
+                      >
+                        Удалить
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={control.fullName} />
+                      <FormField control={control.birthDate} />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={control.relationship} />
+                      <FormField control={control.share} />
+                    </div>
+
+                    <FormField control={control.phone} />
+                  </div>
+                )}
+              </FormArray.List>
             </div>
+          </FormArray.Root>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField control={form.totalBeneficiaryShare} />
           </div>
         </div>
       ) : insuranceType === 'travel' ? (
         <div className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-medium">Путешественники</h3>
-              <button
-                type="button"
-                className="text-blue-600 hover:text-blue-800 text-sm"
-                onClick={() => form.travelers?.push({ 
-                  fullName: '', 
-                  birthDate: '', 
-                  passportNumber: '' 
-                })}
-              >
-                + Добавить путешественника
-              </button>
-            </div>
-
-            {form.travelers && form.travelers.length > 0 && (
-              <div className="space-y-4">
-               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-               {(form.travelers as any)?.map((traveler: any, index: number) => (
-                 <div key={traveler.id} className="border rounded-lg p-4 space-y-4">
-                   <div className="flex justify-between items-center">
-                     <h4 className="font-medium">Путешественник #{index + 1}</h4>
-                     <button
-                       type="button"
-                       className="text-red-600 hover:text-red-800 text-sm"
-                       onClick={() => {
-                         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                         (form.travelers as any)?.removeAt(index);
-                       }}
-                     >
-                       Удалить
-                     </button>
-                   </div>
-
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <FormField control={traveler.fullName} />
-                     <FormField control={traveler.birthDate} />
-                   </div>
-
-                   <FormField control={traveler.passportNumber} />
-                 </div>
-               ))}
+          <FormArray.Root control={form.travelers}>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="font-medium">Путешественники</h3>
+                <FormArray.AddButton className="text-blue-600 hover:text-blue-800 text-sm">
+                  + Добавить путешественника
+                </FormArray.AddButton>
               </div>
-            )}
-          </div>
+
+              <FormArray.Empty>
+                <p className="text-sm text-gray-500">Нет добавленных путешественников</p>
+              </FormArray.Empty>
+
+              <FormArray.List>
+                {({ control, index, remove }) => (
+                  <div key={control.id} className="border rounded-lg p-4 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium">Путешественник #{index + 1}</h4>
+                      <button
+                        type="button"
+                        className="text-red-600 hover:text-red-800 text-sm"
+                        onClick={remove}
+                      >
+                        Удалить
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={control.fullName} />
+                      <FormField control={control.birthDate} />
+                    </div>
+
+                    <FormField control={control.passportNumber} />
+                  </div>
+                )}
+              </FormArray.List>
+            </div>
+          </FormArray.Root>
         </div>
       ) : null}
     </div>

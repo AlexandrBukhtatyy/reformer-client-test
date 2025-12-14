@@ -1,8 +1,9 @@
-import { Input, Select, Checkbox, RadioGroup } from '@/components/ui';
+import { Input, Checkbox } from '@/components/ui';
 import type { FormSchema } from '@reformer/core';
 import type { Step6Form } from './type';
 
 export const step6Schema: FormSchema<Step6Form> = {
+  // Premium calculation results
   basePremium: {
     value: undefined,
     component: Input,
@@ -12,110 +13,70 @@ export const step6Schema: FormSchema<Step6Form> = {
       disabled: true,
     },
   },
-  riskCoefficients: {
-    age: {
-      value: 1,
-      component: Input,
-      componentProps: {
-        label: 'Коэффициент возраста',
-        type: 'number',
-        disabled: true,
-      },
-    },
-    experience: {
-      value: 1,
-      component: Input,
-      componentProps: {
-        label: 'Коэффициент стажа',
-        type: 'number',
-        disabled: true,
-      },
-    },
-    region: {
-      value: 1,
-      component: Input,
-      componentProps: {
-        label: 'Региональный коэффициент',
-        type: 'number',
-        disabled: true,
-      },
-    },
-    vehicleAge: {
-      value: undefined,
-      component: Input,
-      componentProps: {
-        label: 'Коэффициент возраста ТС',
-        type: 'number',
-        disabled: true,
-      },
-    },
-    vehiclePower: {
-      value: undefined,
-      component: Input,
-      componentProps: {
-        label: 'Коэффициент мощности ТС',
-        type: 'number',
-        disabled: true,
-      },
-    },
-    propertyValue: {
-      value: undefined,
-      component: Input,
-      componentProps: {
-        label: 'Коэффициент стоимости имущества',
-        type: 'number',
-        disabled: true,
-      },
+  ageCoefficient: {
+    value: undefined,
+    component: Input,
+    componentProps: {
+      label: 'Коэффициент возраста',
+      type: 'number',
+      disabled: true,
     },
   },
-  discounts: {
-    loyalty: {
-      value: 0,
-      component: Input,
-      componentProps: {
-        label: 'Скидка за лояльность (%)',
-        type: 'number',
-        disabled: true,
-      },
-    },
-    safeDriver: {
-      value: undefined,
-      component: Input,
-      componentProps: {
-        label: 'Скидка за безопасное вождение (%)',
-        type: 'number',
-        disabled: true,
-      },
-    },
-    securitySystem: {
-      value: undefined,
-      component: Input,
-      componentProps: {
-        label: 'Скидка за сигнализацию (%)',
-        type: 'number',
-        disabled: true,
-      },
-    },
-    franchise: {
-      value: undefined,
-      component: Input,
-      componentProps: {
-        label: 'Скидка за франшизу (%)',
-        type: 'number',
-        disabled: true,
-      },
-    },
-    promoCode: {
-      value: undefined,
-      component: Input,
-      componentProps: {
-        label: 'Скидка по промокоду (%)',
-        type: 'number',
-        disabled: true,
-      },
+  experienceCoefficient: {
+    value: undefined,
+    component: Input,
+    componentProps: {
+      label: 'Коэффициент стажа',
+      type: 'number',
+      disabled: true,
     },
   },
-  calculatedPremium: {
+  regionCoefficient: {
+    value: undefined,
+    component: Input,
+    componentProps: {
+      label: 'Региональный коэффициент',
+      type: 'number',
+      disabled: true,
+    },
+  },
+  claimsCoefficient: {
+    value: undefined,
+    component: Input,
+    componentProps: {
+      label: 'Коэффициент страховых случаев',
+      type: 'number',
+      disabled: true,
+    },
+  },
+  deductibleDiscount: {
+    value: undefined,
+    component: Input,
+    componentProps: {
+      label: 'Скидка за франшизу (%)',
+      type: 'number',
+      disabled: true,
+    },
+  },
+  promoDiscount: {
+    value: undefined,
+    component: Input,
+    componentProps: {
+      label: 'Скидка по промокоду (%)',
+      type: 'number',
+      disabled: true,
+    },
+  },
+  multiPolicyDiscount: {
+    value: undefined,
+    component: Input,
+    componentProps: {
+      label: 'Скидка за мультиполис (%)',
+      type: 'number',
+      disabled: true,
+    },
+  },
+  totalPremium: {
     value: undefined,
     component: Input,
     componentProps: {
@@ -124,77 +85,62 @@ export const step6Schema: FormSchema<Step6Form> = {
       disabled: true,
     },
   },
-  paymentMethod: {
-    value: 'online',
-    component: RadioGroup,
-    componentProps: {
-      label: 'Способ оплаты',
-      options: [
-        { value: 'online', label: 'Онлайн-оплата' },
-        { value: 'bank_transfer', label: 'Банковский перевод' },
-        { value: 'installments', label: 'Рассрочка' },
-      ],
-    },
-  },
-  installmentsCount: {
-    value: undefined,
-    component: Select,
-    componentProps: {
-      label: 'Количество платежей',
-      placeholder: 'Выберите количество',
-      options: [
-        { value: 2, label: '2 платежа' },
-        { value: 3, label: '3 платежа' },
-        { value: 4, label: '4 платежа' },
-        { value: 6, label: '6 платежей' },
-      ],
-    },
-  },
   installmentAmount: {
     value: undefined,
     component: Input,
     componentProps: {
-      label: 'Сумма платежа (₽)',
+      label: 'Сумма ежемесячного платежа (₽)',
       type: 'number',
       disabled: true,
     },
   },
-  agreeToTerms: {
+
+  // Confirmation and agreement
+  agreePersonalData: {
     value: false,
     component: Checkbox,
     componentProps: {
-      label: 'Я согласен с условиями страхования',
+      label: 'Согласие на обработку персональных данных',
     },
   },
-  agreeToProcessing: {
+  agreeTerms: {
     value: false,
     component: Checkbox,
     componentProps: {
-      label: 'Я даю согласие на обработку персональных данных',
+      label: 'Согласие с условиями страхования',
     },
   },
-  agreeToCommunications: {
+  agreeElectronicPolicy: {
     value: false,
     component: Checkbox,
     componentProps: {
-      label: 'Я согласен получать информационные сообщения',
+      label: 'Согласие на электронный полис',
     },
   },
-  confirmInformation: {
+  agreeMarketing: {
     value: false,
     component: Checkbox,
     componentProps: {
-      label: 'Я подтверждаю достоверность предоставленной информации',
+      label: 'Согласие на маркетинговые рассылки',
+    },
+  },
+  confirmAccuracy: {
+    value: false,
+    component: Checkbox,
+    componentProps: {
+      label: 'Подтверждение достоверности информации',
     },
   },
   electronicSignature: {
     value: '',
     component: Input,
     componentProps: {
-      label: 'Электронная подпись (ФИО)',
-      placeholder: 'Иванов Иван Иванович',
+      label: 'Электронная подпись',
+      placeholder: 'ФИО полностью',
     },
   },
+
+  // Policy data
   policyNumber: {
     value: '',
     component: Input,
