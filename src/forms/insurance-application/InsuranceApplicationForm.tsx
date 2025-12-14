@@ -107,12 +107,12 @@ export function InsuranceApplicationForm({
 
         {/* Step content */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <FormNavigation.Step component={Step1Form} control={form} />
-          <FormNavigation.Step component={Step2Form} control={form} />
-          <FormNavigation.Step component={Step3Form} control={form} />
-          <FormNavigation.Step component={Step4Form} control={form} />
-          <FormNavigation.Step component={Step5Form} control={form} />
-          <FormNavigation.Step component={Step6Form} control={form} />
+          <FormNavigation.Step component={Step1Form} control={form} form={form} />
+          <FormNavigation.Step component={Step2Form} control={form} form={form} />
+          <FormNavigation.Step component={Step3Form} control={form} form={form} />
+          <FormNavigation.Step component={Step4Form} control={form} form={form} />
+          <FormNavigation.Step component={Step5Form} control={form} form={form} />
+          <FormNavigation.Step component={Step6Form} control={form} form={form} />
         </div>
 
         {/* Navigation buttons */}
