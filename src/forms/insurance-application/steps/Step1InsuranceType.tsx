@@ -22,11 +22,10 @@ export function Step1InsuranceType({ control }: Step1Props) {
   const startDate = useFormControlValue(control.startDate);
   const insurancePeriod = useFormControlValue(control.insurancePeriod);
 
-  // Calculate endDate when startDate or insurancePeriod changes
+  // Workaround: watchField from @reformer/core/behaviors doesn't trigger callbacks
   useEffect(() => {
     if (startDate && insurancePeriod) {
-      const endDate = addMonths(startDate, Number(insurancePeriod));
-      control.endDate.setValue(endDate);
+      control.endDate.setValue(addMonths(String(startDate), Number(insurancePeriod)));
     } else {
       control.endDate.setValue('');
     }

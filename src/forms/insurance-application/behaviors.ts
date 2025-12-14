@@ -78,8 +78,8 @@ export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicatio
   // Step 1: Computed Fields
   // ===========================
 
-  // Note: End Date calculation is handled via useEffect in Step1InsuranceType.tsx
-  // because watchField doesn't trigger callbacks as expected in this context.
+  // NOTE: endDate calculation is handled via useEffect in Step1InsuranceType.tsx
+  // because watchField callbacks don't trigger (bug in @reformer/core)
 
   // Installments conditional visibility (top-level field, no nesting issue)
   enableWhen(path.installments, (form) => form.paymentType === 'installments', { resetOnDisable: true });
