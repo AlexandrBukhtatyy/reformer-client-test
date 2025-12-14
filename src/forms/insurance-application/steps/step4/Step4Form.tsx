@@ -5,12 +5,12 @@ import type { GroupNodeWithControls } from '@reformer/core';
 import type { InsuranceApplicationForm } from '../../type';
 
 interface Step4FormProps {
-  form: GroupNodeWithControls<InsuranceApplicationForm>;
+  control: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
-export function Step4Form({ form }: Step4FormProps) {
-  const insuranceType = useFormControlValue(form?.insuranceType);
-  const unlimitedDrivers = useFormControlValue(form.unlimitedDrivers);
+export function Step4Form({ control }: Step4FormProps) {
+  const insuranceType = useFormControlValue(control?.insuranceType);
+  const unlimitedDrivers = useFormControlValue(control.unlimitedDrivers);
 
   return (
     <div className="space-y-6">
@@ -28,14 +28,14 @@ export function Step4Form({ form }: Step4FormProps) {
       {(insuranceType === 'casco' || insuranceType === 'osago') ? (
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <FormField control={form.unlimitedDrivers} />
-            {form.unlimitedDrivers.value.value && (
+            <FormField control={control.unlimitedDrivers} />
+            {control.unlimitedDrivers.value.value && (
               <span className="text-sm text-gray-50">Будет разрешено неограниченное количество водителей</span>
             )}
           </div>
 
           {!unlimitedDrivers && (
-            <FormArray.Root control={form.drivers}>
+            <FormArray.Root control={control.drivers}>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="font-medium">Водители</h3>
@@ -85,13 +85,13 @@ export function Step4Form({ form }: Step4FormProps) {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={form.minDriverAge} />
-            <FormField control={form.minDriverExperience} />
+            <FormField control={control.minDriverAge} />
+            <FormField control={control.minDriverExperience} />
           </div>
         </div>
       ) : insuranceType === 'life' ? (
         <div className="space-y-6">
-          <FormArray.Root control={form.beneficiaries}>
+          <FormArray.Root control={control.beneficiaries}>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="font-medium">Выгодоприобретатели</h3>
@@ -136,12 +136,12 @@ export function Step4Form({ form }: Step4FormProps) {
           </FormArray.Root>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={form.totalBeneficiaryShare} />
+            <FormField control={control.totalBeneficiaryShare} />
           </div>
         </div>
       ) : insuranceType === 'travel' ? (
         <div className="space-y-6">
-          <FormArray.Root control={form.travelers}>
+          <FormArray.Root control={control.travelers}>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="font-medium">Путешественники</h3>

@@ -1,5 +1,5 @@
 import { createForm } from '@reformer/core';
-import { useStepForm } from '@/hooks/useStepForm';
+import { FormNavigation } from '@reformer/ui/form-navigation';
 import { Step1Form } from './steps/step1/Step1Form';
 import { Step2Form } from './steps/step2/Step2Form';
 import { Step3Form } from './steps/step3/Step3Form';
@@ -9,68 +9,49 @@ import { Step6Form } from './steps/step6/Step6Form';
 import { insuranceApplicationSchema } from './formSchema';
 import { insuranceApplicationValidation } from './formValidators';
 import { insuranceApplicationBehavior } from './formBehaviors';
+import { step1Validation } from './steps/step1/validators';
+import { step2Validation } from './steps/step2/validators';
+import { step3Validation } from './steps/step3/validators';
+import { step4Validation } from './steps/step4/validators';
+import { step5Validation } from './steps/step5/validators';
+import { step6Validation } from './steps/step6/validators';
 import type { InsuranceApplicationForm } from './type';
 
 interface InsuranceApplicationFormProps {
-  initialData?: Partial<InsuranceApplicationForm>;
   onSubmit: (data: InsuranceApplicationForm) => void;
 }
 
-export function InsuranceApplicationForm({ 
-  initialData, 
-  onSubmit 
+const STEPS = [
+  { number: 1, title: 'Тип страхования' },
+  { number: 2, title: 'Данные страхователя' },
+  { number: 3, title: 'Объект страхования' },
+  { number: 4, title: 'Водители/Выгодоприобретатели' },
+  { number: 5, title: 'История и доп. информация' },
+  { number: 6, title: 'Расчет и подтверждение' },
+];
+
+export function InsuranceApplicationForm({
+  onSubmit
 }: InsuranceApplicationFormProps) {
   // Create the main form with all steps
   const form = createForm<InsuranceApplicationForm>({
     form: insuranceApplicationSchema,
     validation: insuranceApplicationValidation,
-    behavior: insuranceApplicationBehavior,
-    initialValues: initialData
+    behavior: insuranceApplicationBehavior
   });
 
-  // Initialize step forms
-  const stepForms = [
-    form.step1,
-    form.step2,
-    form.step3,
-    form.step4,
-    form.step5,
-    form.step6
-  ];
-
-  // Use step form navigation
-  const {
-    currentStep,
-    nextStep,
-    prevStep,
-    goToStep,
-    isLastStep,
-    isFirstStep,
-    validateCurrentStep
-  } = useStepForm(stepForms);
-
-  const handleNext = async () => {
-    const isValid = await validateCurrentStep();
-    if (isValid) {
-      await nextStep();
-    }
+  // Configuration for step validation
+  const config = {
+    stepValidations: {
+      1: step1Validation,
+      2: step2Validation,
+      3: step3Validation,
+      4: step4Validation,
+      5: step5Validation,
+      6: step6Validation,
+    },
+    fullValidation: insuranceApplicationValidation,
   };
-
-  const handleSubmit = async () => {
-    const isValid = await validateCurrentStep();
-    if (isValid && isLastStep) {
-      onSubmit(form.getValue());
-    }
-  };
-
-  const stepTitles = [
-    'Тип страхования',
-    'Данные страхователя',
-    'Объект страхования',
-    'Водители/Выгодоприобретатели',
-    'История и доп. информация',
-    'Расчет и подтверждение'
-  ];
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -79,88 +60,101 @@ export function InsuranceApplicationForm({
         <p className="text-gray-600">Заполните все шаги для оформления полиса</p>
       </div>
 
-      {/* Step indicator */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          {stepTitles.map((title, index) => (
-            <div key={index} className="flex items-center">
-              <div 
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  index === currentStep 
-                    ? 'bg-blue-600 text-white' 
-                    : index < currentStep 
-                      ? 'bg-green-600 text-white' 
-                      : 'bg-gray-200 text-gray-700'
+      <FormNavigation form={form} config={config}>
+        {/* Step indicator */}
+        <div className="mb-8">
+          <FormNavigation.Indicator steps={STEPS}>
+            {({ steps, goToStep }) => (
+              <>
+                <div className="flex items-center justify-between">
+                  {steps.map((step, index) => (
+                    <div key={step.number} className="flex items-center">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer ${
+                          step.isCurrent
+                            ? 'bg-blue-600 text-white'
+                            : step.isCompleted
+                              ? 'bg-green-600 text-white'
+                              : 'bg-gray-200 text-gray-700'
+                        }`}
+                        onClick={() => step.canNavigate && goToStep(step.number)}
+                        style={{ cursor: step.canNavigate ? 'pointer' : 'default' }}
+                      >
+                        {step.isCompleted ? '✓' : step.number}
+                      </div>
+                      {index < steps.length - 1 && (
+                        <div className={`h-1 w-16 ${step.isCompleted ? 'bg-green-600' : 'bg-gray-200'}`}></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between mt-2 text-xs text-gray-600">
+                  {steps.map((step) => (
+                    <div
+                      key={step.number}
+                      className={`text-center ${step.isCurrent || step.isCompleted ? 'text-blue-600 font-medium' : ''}`}
+                      style={{ width: `${100 / steps.length}%`, cursor: step.canNavigate ? 'pointer' : 'default' }}
+                      onClick={() => step.canNavigate && goToStep(step.number)}
+                    >
+                      {step.title}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </FormNavigation.Indicator>
+        </div>
+
+        {/* Step content */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <FormNavigation.Step component={Step1Form} control={form} />
+          <FormNavigation.Step component={Step2Form} control={form} />
+          <FormNavigation.Step component={Step3Form} control={form} />
+          <FormNavigation.Step component={Step4Form} control={form} />
+          <FormNavigation.Step component={Step5Form} control={form} />
+          <FormNavigation.Step component={Step6Form} control={form} />
+        </div>
+
+        {/* Navigation buttons */}
+        <FormNavigation.Actions onSubmit={() => onSubmit(form.getValue())}>
+          {({ prev, next, submit, isFirstStep, isLastStep, isValidating }) => (
+            <div className="flex justify-between">
+              <button
+                type="button"
+                onClick={prev.onClick}
+                disabled={prev.disabled || isFirstStep}
+                className={`px-4 py-2 rounded-md ${
+                  isFirstStep
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-600 text-white hover:bg-gray-700'
                 }`}
-                onClick={() => goToStep(index)}
-                style={{ cursor: index <= currentStep ? 'pointer' : 'default' }}
               >
-                {index + 1}
-              </div>
-              {index < stepTitles.length - 1 && (
-                <div className={`h-1 w-16 ${index < currentStep ? 'bg-green-600' : 'bg-gray-200'}`}></div>
+                Назад
+              </button>
+
+              {isLastStep ? (
+                <button
+                  type="button"
+                  onClick={submit.onClick}
+                  disabled={submit.disabled}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                >
+                  {submit.isSubmitting ? 'Отправка...' : 'Подать заявку'}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={next.onClick}
+                  disabled={next.disabled}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isValidating ? 'Проверка...' : 'Далее'}
+                </button>
               )}
             </div>
-          ))}
-        </div>
-        <div className="flex justify-between mt-2 text-xs text-gray-600">
-          {stepTitles.map((title, index) => (
-            <div 
-              key={index} 
-              className={`text-center ${index <= currentStep ? 'text-blue-600 font-medium' : ''}`}
-              style={{ width: `${100 / stepTitles.length}%` }}
-              onClick={() => goToStep(index)}
-              style={{ cursor: index <= currentStep ? 'pointer' : 'default' }}
-            >
-              {title}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Step content */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        {currentStep === 0 && <Step1Form form={form.step1} />}
-        {currentStep === 1 && <Step2Form form={form.step2} />}
-        {currentStep === 2 && <Step3Form form={form.step3} insuranceType={form.step1.insuranceType.value.value} />}
-        {currentStep === 3 && <Step4Form form={form.step4} insuranceType={form.step1.insuranceType.value.value} />}
-        {currentStep === 4 && <Step5Form form={form.step5} />}
-        {currentStep === 5 && <Step6Form form={form.step6} />}
-      </div>
-
-      {/* Navigation buttons */}
-      <div className="flex justify-between">
-        <button
-          type="button"
-          onClick={prevStep}
-          disabled={isFirstStep}
-          className={`px-4 py-2 rounded-md ${
-            isFirstStep 
-              ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-              : 'bg-gray-600 text-white hover:bg-gray-700'
-          }`}
-        >
-          Назад
-        </button>
-
-        {isLastStep ? (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-          >
-            Подать заявку
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleNext}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Далее
-          </button>
-        )}
-      </div>
+          )}
+        </FormNavigation.Actions>
+      </FormNavigation>
     </div>
   );
 }

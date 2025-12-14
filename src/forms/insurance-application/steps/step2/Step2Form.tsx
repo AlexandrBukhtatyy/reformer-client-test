@@ -4,11 +4,11 @@ import type { GroupNodeWithControls } from '@reformer/core';
 import type { InsuranceApplicationForm } from '../../type';
 
 interface Step2FormProps {
-  form: GroupNodeWithControls<InsuranceApplicationForm>;
+  control: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
-export function Step2Form({ form }: Step2FormProps) {
-  const insuredType = useFormControlValue(form.insuredType);
+export function Step2Form({ control }: Step2FormProps) {
+  const insuredType = useFormControlValue(control.insuredType);
 
   return (
     <div className="space-y-6">
@@ -17,30 +17,30 @@ export function Step2Form({ form }: Step2FormProps) {
         <p className="text-sm text-gray-500">Укажите персональные или корпоративные данные</p>
       </div>
 
-      <FormField control={form.insuredType} />
+      <FormField control={control.insuredType} />
 
       {insuredType === 'individual' && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormField control={form.personalData!.lastName} />
-            <FormField control={form.personalData!.firstName} />
-            <FormField control={form.personalData!.middleName} />
+            <FormField control={control.personalData!.lastName} />
+            <FormField control={control.personalData!.firstName} />
+            <FormField control={control.personalData!.middleName} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={form.personalData!.birthDate} />
-            <FormField control={form.personalData!.gender} />
+            <FormField control={control.personalData!.birthDate} />
+            <FormField control={control.personalData!.gender} />
           </div>
 
           <div className="space-y-4">
             <h3 className="font-medium">Паспортные данные</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField control={form.passportData!.series} />
-              <FormField control={form.passportData!.number} />
+              <FormField control={control.passportData!.series} />
+              <FormField control={control.passportData!.number} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField control={form.passportData!.issueDate} />
-              <FormField control={form.passportData!.issuedBy} />
+              <FormField control={control.passportData!.issueDate} />
+              <FormField control={control.passportData!.issuedBy} />
             </div>
           </div>
         </div>
@@ -48,26 +48,26 @@ export function Step2Form({ form }: Step2FormProps) {
 
       {insuredType === 'company' && (
         <div className="space-y-4">
-          <FormField control={form.companyData!.name} />
+          <FormField control={control.companyData!.name} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={form.companyData!.inn} />
-            <FormField control={form.companyData!.ogrn} />
+            <FormField control={control.companyData!.inn} />
+            <FormField control={control.companyData!.ogrn} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField control={form.companyData!.kpp} />
-            <FormField control={form.companyData!.ceoName} />
+            <FormField control={control.companyData!.kpp} />
+            <FormField control={control.companyData!.ceoName} />
           </div>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={form.phone} />
-        <FormField control={form.email} />
+        <FormField control={control.phone} />
+        <FormField control={control.email} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={form.fullName} />
-        <FormField control={form.age} />
+        <FormField control={control.fullName} />
+        <FormField control={control.age} />
       </div>
     </div>
   );

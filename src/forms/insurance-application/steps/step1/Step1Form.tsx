@@ -4,11 +4,11 @@ import type { GroupNodeWithControls } from '@reformer/core';
 import type { InsuranceApplicationForm } from '../../type';
 
 interface Step1FormProps {
-  form: GroupNodeWithControls<InsuranceApplicationForm>;
+  control: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
-export function Step1Form({ form }: Step1FormProps) {
-  const paymentTypeValue = useFormControlValue(form.paymentType!);
+export function Step1Form({ control }: Step1FormProps) {
+  const paymentTypeValue = useFormControlValue(control.paymentType!);
 
   return (
     <div className="space-y-6">
@@ -18,25 +18,25 @@ export function Step1Form({ form }: Step1FormProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={form.insuranceType} />
-        <FormField control={form.insurancePeriod} />
+        <FormField control={control.insuranceType} />
+        <FormField control={control.insurancePeriod} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={form.startDate} />
-        <FormField control={form.endDate} />
+        <FormField control={control.startDate} />
+        <FormField control={control.endDate} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={form.coverageAmount} />
-        <FormField control={form.deductible} />
+        <FormField control={control.coverageAmount} />
+        <FormField control={control.deductible} />
       </div>
 
       <div className="space-y-4">
-        <FormField control={form.paymentType} />
+        <FormField control={control.paymentType} />
         
         {paymentTypeValue === 'installments' && (
-          <FormField control={form.installments} />
+          <FormField control={control.installments} />
         )}
       </div>
     </div>

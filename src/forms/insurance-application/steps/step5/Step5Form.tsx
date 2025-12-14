@@ -5,12 +5,12 @@ import type { GroupNodeWithControls } from '@reformer/core';
 import type { InsuranceApplicationForm } from '../../type';
 
 interface Step5FormProps {
-  form: GroupNodeWithControls<InsuranceApplicationForm>;
+  control: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
-export function Step5Form({ form }: Step5FormProps) {
-  const hasPreviousInsurance = useFormControlValue(form.hasPreviousInsurance);
-  const hadClaims = useFormControlValue(form.hadClaims);
+export function Step5Form({ control }: Step5FormProps) {
+  const hasPreviousInsurance = useFormControlValue(control.hasPreviousInsurance);
+  const hadClaims = useFormControlValue(control.hadClaims);
 
   return (
     <div className="space-y-6">
@@ -20,22 +20,22 @@ export function Step5Form({ form }: Step5FormProps) {
       </div>
 
       <div className="space-y-4">
-        <FormField control={form.hasPreviousInsurance} />
+        <FormField control={control.hasPreviousInsurance} />
         
         {hasPreviousInsurance === true && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg">
-            <FormField control={form.previousInsurer} />
-            <FormField control={form.previousPolicyNumber} />
-            <FormField control={form.previousPolicyEndDate} />
+            <FormField control={control.previousInsurer} />
+            <FormField control={control.previousPolicyNumber} />
+            <FormField control={control.previousPolicyEndDate} />
           </div>
         )}
       </div>
 
       <div className="space-y-4">
-        <FormField control={form.hadClaims} />
+        <FormField control={control.hadClaims} />
         
         {hadClaims === true && (
-          <FormArray.Root control={form.claims}>
+          <FormArray.Root control={control.claims}>
             <div className="space-y-4 p-4 border rounded-lg">
               <div className="flex justify-between items-center">
                 <h3 className="font-medium">Страховые случаи</h3>
@@ -80,13 +80,13 @@ export function Step5Form({ form }: Step5FormProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={form.promoCode} />
-        <FormField control={form.referralSource} />
+        <FormField control={control.promoCode} />
+        <FormField control={control.referralSource} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={form.agentCode} />
-        <FormField control={form.additionalNotes} />
+        <FormField control={control.agentCode} />
+        <FormField control={control.additionalNotes} />
       </div>
     </div>
   );
