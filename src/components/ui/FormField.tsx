@@ -10,7 +10,9 @@ export interface FormFieldProps {
 }
 
 const FormFieldComponent: React.FC<FormFieldProps> = ({ control, className, testId }) => {
-  const { value, errors, pending, disabled, shouldShowError, componentProps } = useFormControl(control);
+  const { value, errors, pending, disabled, shouldShowError, componentProps } =
+    useFormControl(control);
+
   const Component = control.component;
   const isCheckbox = control.component === Checkbox;
   const safeValue = value ?? (isCheckbox ? false : '');

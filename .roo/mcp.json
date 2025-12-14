@@ -1,1 +1,1 @@
-{"mcpServers":{"reformer-mcp":{"command":"node","args":["D:\\Work\\ReFormer\\packages\\reformer-mcp\\dist\\index.js"],"alwaysAllow":["report_issue"]},"playwright":{"command":"npx","args":["@playwright/mcp@latest"],"disabled":false,"alwaysAllow":[]}}}
+{"mcpServers":{"reformer-mcp":{"command":"node","args":["D:\\Work\\ReFormer\\packages\\reformer-mcp\\dist\\index.js"]},"playwright":{"command":"npx","args":["@playwright/mcp@latest"],"disabled":false,"alwaysAllow":[]}}}
