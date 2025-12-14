@@ -5,14 +5,14 @@ import type { GroupNodeWithControls } from '@reformer/core';
 import type { InsuranceApplicationForm } from '../../type';
 
 interface Step5FormProps {
-  control: GroupNodeWithControls<InsuranceApplicationForm>;
+  form: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
-export function Step5Form({ control }: Step5FormProps) {
-  const hasPreviousInsurance = useFormControlValue(control?.hasPreviousInsurance);
-  const hadClaims = useFormControlValue(control?.hadClaims);
+export function Step5Form({ form }: Step5FormProps) {
+  const hasPreviousInsurance = useFormControlValue(form?.hasPreviousInsurance);
+  const hadClaims = useFormControlValue(form?.hadClaims);
 
-  if (!control) return null;
+  if (!form) return null;
 
   return (
     <div className="space-y-6">
@@ -22,22 +22,22 @@ export function Step5Form({ control }: Step5FormProps) {
       </div>
 
       <div className="space-y-4">
-        <FormField control={control.hasPreviousInsurance} />
+        <FormField control={form.hasPreviousInsurance} />
         
         {hasPreviousInsurance === true && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg">
-            <FormField control={control.previousInsurer} />
-            <FormField control={control.previousPolicyNumber} />
-            <FormField control={control.previousPolicyEndDate} />
+            <FormField control={form.previousInsurer} />
+            <FormField control={form.previousPolicyNumber} />
+            <FormField control={form.previousPolicyEndDate} />
           </div>
         )}
       </div>
 
       <div className="space-y-4">
-        <FormField control={control.hadClaims} />
+        <FormField control={form.hadClaims} />
         
         {hadClaims === true && (
-          <FormArray.Root control={control.claims}>
+          <FormArray.Root control={form.claims}>
             <div className="space-y-4 p-4 border rounded-lg">
               <div className="flex justify-between items-center">
                 <h3 className="font-medium">Страховые случаи</h3>
@@ -63,7 +63,7 @@ export function Step5Form({ control }: Step5FormProps) {
                         Удалить
                       </button>
                     </div>
-  
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField control={control.date} />
                       <FormField control={control.type} />
@@ -82,13 +82,13 @@ export function Step5Form({ control }: Step5FormProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={control.promoCode} />
-        <FormField control={control.referralSource} />
+        <FormField control={form.promoCode} />
+        <FormField control={form.referralSource} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField control={control.agentCode} />
-        <FormField control={control.additionalNotes} />
+        <FormField control={form.agentCode} />
+        <FormField control={form.additionalNotes} />
       </div>
     </div>
   );

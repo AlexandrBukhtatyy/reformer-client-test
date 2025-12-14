@@ -4,17 +4,17 @@ import type { GroupNodeWithControls } from '@reformer/core';
 import type { InsuranceApplicationForm } from '../../type';
 
 interface Step6FormProps {
-  control: GroupNodeWithControls<InsuranceApplicationForm>;
+  form: GroupNodeWithControls<InsuranceApplicationForm>;
 }
 
-export function Step6Form({ control }: Step6FormProps) {
-  const agreePersonalData = useFormControlValue(control?.agreePersonalData);
-  const agreeTerms = useFormControlValue(control?.agreeTerms);
-  const agreeElectronicPolicy = useFormControlValue(control?.agreeElectronicPolicy);
-  const agreeMarketing = useFormControlValue(control?.agreeMarketing);
-  const confirmAccuracy = useFormControlValue(control?.confirmAccuracy);
+export function Step6Form({ form }: Step6FormProps) {
+  const agreePersonalData = useFormControlValue(form?.agreePersonalData);
+  const agreeTerms = useFormControlValue(form?.agreeTerms);
+  const agreeElectronicPolicy = useFormControlValue(form?.agreeElectronicPolicy);
+  const agreeMarketing = useFormControlValue(form?.agreeMarketing);
+  const confirmAccuracy = useFormControlValue(form?.confirmAccuracy);
 
-  if (!control) return null;
+  if (!form) return null;
 
   return (
     <div className="space-y-6">
@@ -27,25 +27,25 @@ export function Step6Form({ control }: Step6FormProps) {
         <h3 className="font-medium text-lg">Расчет стоимости</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField control={control.basePremium} />
-          <FormField control={control.totalPremium} />
+          <FormField control={form.basePremium} />
+          <FormField control={form.totalPremium} />
         </div>
 
         <div className="space-y-4">
           <h4 className="font-medium">Коэффициенты и скидки</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <FormField control={control.ageCoefficient} />
-            <FormField control={control.experienceCoefficient} />
-            <FormField control={control.regionCoefficient} />
-            <FormField control={control.claimsCoefficient} />
-            <FormField control={control.deductibleDiscount} />
-            <FormField control={control.promoDiscount} />
-            <FormField control={control.multiPolicyDiscount} />
+            <FormField control={form.ageCoefficient} />
+            <FormField control={form.experienceCoefficient} />
+            <FormField control={form.regionCoefficient} />
+            <FormField control={form.claimsCoefficient} />
+            <FormField control={form.deductibleDiscount} />
+            <FormField control={form.promoDiscount} />
+            <FormField control={form.multiPolicyDiscount} />
           </div>
         </div>
 
-        {control.installmentAmount && (
-          <FormField control={control.installmentAmount} />
+        {form.installmentAmount && (
+          <FormField control={form.installmentAmount} />
         )}
       </div>
 
@@ -53,15 +53,15 @@ export function Step6Form({ control }: Step6FormProps) {
         <h3 className="font-medium text-lg">Подтверждение и согласия</h3>
         
         <div className="space-y-4">
-          <FormField control={control.agreePersonalData} />
-          <FormField control={control.agreeTerms} />
-          <FormField control={control.agreeElectronicPolicy} />
-          <FormField control={control.agreeMarketing} />
-          <FormField control={control.confirmAccuracy} />
+          <FormField control={form.agreePersonalData} />
+          <FormField control={form.agreeTerms} />
+          <FormField control={form.agreeElectronicPolicy} />
+          <FormField control={form.agreeMarketing} />
+          <FormField control={form.confirmAccuracy} />
         </div>
 
         {(agreePersonalData === true && agreeTerms === true && agreeElectronicPolicy === true && agreeMarketing === true && confirmAccuracy === true) && (
-          <FormField control={control.electronicSignature} />
+          <FormField control={form.electronicSignature} />
         )}
       </div>
 
@@ -69,11 +69,11 @@ export function Step6Form({ control }: Step6FormProps) {
         <h3 className="font-medium text-lg">Данные полиса</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField control={control.policyNumber} />
-          <FormField control={control.policyStartDate} />
+          <FormField control={form.policyNumber} />
+          <FormField control={form.policyStartDate} />
         </div>
         
-        <FormField control={control.policyEndDate} />
+        <FormField control={form.policyEndDate} />
       </div>
     </div>
   );
