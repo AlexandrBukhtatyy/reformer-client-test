@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { createForm } from '@reformer/core';
 import { FormNavigation } from '@reformer/ui/form-navigation';
 import { Step1Form } from './steps/step1/Step1Form';
@@ -33,15 +34,15 @@ const STEPS = [
 export function InsuranceApplicationForm({
   onSubmit
 }: InsuranceApplicationFormProps) {
-  // Create the main form with all steps
-  const form = createForm<InsuranceApplicationForm>({
+  // Create the main form ONCE (memoized to prevent re-creation on every render)
+  const form = useMemo(() => createForm<InsuranceApplicationForm>({
     form: insuranceApplicationSchema,
     validation: insuranceApplicationValidation,
     behavior: insuranceApplicationBehavior
-  });
+  }), []);
 
   // Configuration for step validation
-  const config = {
+  const config = useMemo(() => ({
     stepValidations: {
       1: step1Validation,
       2: step2Validation,
@@ -51,7 +52,7 @@ export function InsuranceApplicationForm({
       6: step6Validation,
     },
     fullValidation: insuranceApplicationValidation,
-  };
+  }), []);
 
   return (
     <div className="max-w-4xl mx-auto p-6">
