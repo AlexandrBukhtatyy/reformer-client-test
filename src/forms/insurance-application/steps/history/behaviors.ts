@@ -7,8 +7,10 @@ export const historyBehaviors: BehaviorSchemaFn<HistoryStep> = (path) => {
   watchField(
     path.hasClaimsHistory,
     (hasClaimsHistory, ctx) => {
-      if (!hasClaimsHistory && ctx.form.claims) {
-        ctx.form.claims.clear();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const form = ctx.form as any;
+      if (!hasClaimsHistory && form?.claims?.clear) {
+        form.claims.clear();
       }
     },
     { immediate: false }

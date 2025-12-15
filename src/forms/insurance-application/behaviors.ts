@@ -19,9 +19,11 @@ export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicatio
   watchField(
     path.insuranceType,
     (insuranceType, ctx) => {
-      const coverageAmount = ctx.form.coverageAmount.value.value || 0;
-      const vehicleMarketValue = ctx.form.vehicle?.marketValue?.value?.value || 0;
-      const propertyMarketValue = ctx.form.property?.marketValue?.value?.value || 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const form = ctx.form as any;
+      const coverageAmount = form?.coverageAmount?.value ?? 0;
+      const vehicleMarketValue = form?.vehicle?.marketValue?.value ?? 0;
+      const propertyMarketValue = form?.property?.marketValue?.value ?? 0;
 
       let basePremium = 0;
 
@@ -39,7 +41,7 @@ export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicatio
           basePremium = coverageAmount * PREMIUM_COEFFICIENTS.baseTariffs.life;
           break;
         case 'travel':
-          const tripDuration = ctx.form.travel?.tripDuration?.value?.value || 7;
+          const tripDuration = form?.travel?.tripDuration?.value ?? 7;
           basePremium = tripDuration * PREMIUM_COEFFICIENTS.baseTariffs.travel * 90; // USD to RUB
           break;
         default:
@@ -145,12 +147,14 @@ export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicatio
   watchField(
     path.basePremium,
     (basePremium, ctx) => {
-      const ageCoeff = ctx.form.ageCoefficient.value.value || 1;
-      const expCoeff = ctx.form.experienceCoefficient.value.value || 1;
-      const regCoeff = ctx.form.regionalCoefficient.value.value || 1;
-      const kbmCoeff = ctx.form.kbmCoefficient.value.value || 1;
-      const deductDiscount = ctx.form.deductibleDiscount.value.value || 0;
-      const promoDiscount = ctx.form.promoDiscount.value.value || 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const form = ctx.form as any;
+      const ageCoeff = form?.ageCoefficient?.value ?? 1;
+      const expCoeff = form?.experienceCoefficient?.value ?? 1;
+      const regCoeff = form?.regionalCoefficient?.value ?? 1;
+      const kbmCoeff = form?.kbmCoefficient?.value ?? 1;
+      const deductDiscount = form?.deductibleDiscount?.value ?? 0;
+      const promoDiscount = form?.promoDiscount?.value ?? 0;
 
       const premium = basePremium || 0;
       const total =
@@ -165,8 +169,10 @@ export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicatio
   watchField(
     path.totalPremium,
     (totalPremium, ctx) => {
-      const paymentType = ctx.form.paymentType.value.value;
-      const installments = ctx.form.installments.value.value;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const form = ctx.form as any;
+      const paymentType = form?.paymentType?.value;
+      const installments = form?.installments?.value;
 
       if (paymentType === 'installments' && installments && totalPremium) {
         const installmentAmount =

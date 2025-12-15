@@ -7,10 +7,12 @@ export const insuredPartyBehaviors: BehaviorSchemaFn<InsuredPartyStep> = (path) 
   watchField(
     path.personalData.lastName,
     (lastName, ctx) => {
-      const firstName = ctx.form.firstName.value.value || '';
-      const middleName = ctx.form.middleName.value.value || '';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const form = ctx.form as any;
+      const firstName = form?.personalData?.firstName?.value ?? '';
+      const middleName = form?.personalData?.middleName?.value ?? '';
       const fullName = [lastName, firstName, middleName].filter(Boolean).join(' ');
-      ctx.setFieldValue('fullName', fullName);
+      ctx.setFieldValue('personalData.fullName', fullName);
     },
     { immediate: false }
   );
@@ -18,10 +20,12 @@ export const insuredPartyBehaviors: BehaviorSchemaFn<InsuredPartyStep> = (path) 
   watchField(
     path.personalData.firstName,
     (firstName, ctx) => {
-      const lastName = ctx.form.lastName.value.value || '';
-      const middleName = ctx.form.middleName.value.value || '';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const form = ctx.form as any;
+      const lastName = form?.personalData?.lastName?.value ?? '';
+      const middleName = form?.personalData?.middleName?.value ?? '';
       const fullName = [lastName, firstName, middleName].filter(Boolean).join(' ');
-      ctx.setFieldValue('fullName', fullName);
+      ctx.setFieldValue('personalData.fullName', fullName);
     },
     { immediate: false }
   );
@@ -29,10 +33,12 @@ export const insuredPartyBehaviors: BehaviorSchemaFn<InsuredPartyStep> = (path) 
   watchField(
     path.personalData.middleName,
     (middleName, ctx) => {
-      const lastName = ctx.form.lastName.value.value || '';
-      const firstName = ctx.form.firstName.value.value || '';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const form = ctx.form as any;
+      const lastName = form?.personalData?.lastName?.value ?? '';
+      const firstName = form?.personalData?.firstName?.value ?? '';
       const fullName = [lastName, firstName, middleName].filter(Boolean).join(' ');
-      ctx.setFieldValue('fullName', fullName);
+      ctx.setFieldValue('personalData.fullName', fullName);
     },
     { immediate: false }
   );
@@ -49,9 +55,9 @@ export const insuredPartyBehaviors: BehaviorSchemaFn<InsuredPartyStep> = (path) 
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
           age--;
         }
-        ctx.setFieldValue('age', age > 0 ? age : undefined);
+        ctx.setFieldValue('personalData.age', age > 0 ? age : undefined);
       } else {
-        ctx.setFieldValue('age', undefined);
+        ctx.setFieldValue('personalData.age', undefined);
       }
     },
     { immediate: false }
