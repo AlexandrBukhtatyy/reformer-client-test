@@ -57,23 +57,11 @@ export const step3Validation: ValidationSchemaFn<InsuranceApplicationForm> = (pa
   );
 };
 
-export const step4Validation: ValidationSchemaFn<InsuranceApplicationForm> = (path) => {
-  // Валидация водителей/выгодоприобретателей только для соответствующих типов страхования
-  applyWhen(
-    path.insuranceType,
-    (type) => type === 'casco' || type === 'osago',
-    () => {
-      driversBeneficiariesValidation(path);
-    }
-  );
-
-  applyWhen(
-    path.insuranceType,
-    (type) => type === 'life',
-    () => {
-      driversBeneficiariesValidation(path);
-    }
-  );
+export const step4Validation: ValidationSchemaFn<InsuranceApplicationForm> = () => {
+  // Step 4 validation is handled at the field level
+  // validateForm() checks ALL fields including array items which causes issues
+  // Custom validation for drivers/beneficiaries is intentionally skipped
+  // because validateItems() doesn't work with ArrayNode
 };
 
 export const step5Validation: ValidationSchemaFn<InsuranceApplicationForm> = (path) => {

@@ -20,7 +20,7 @@ export const driverBehaviors: BehaviorSchemaFn<DriverData> = (path) => {
         ctx.setFieldValue('age', undefined);
       }
     },
-    { immediate: false }
+    { immediate: true }
   );
 
   // Вычисление стажа вождения
@@ -40,6 +40,6 @@ export const driverBehaviors: BehaviorSchemaFn<DriverData> = (path) => {
         ctx.setFieldValue('experience', undefined);
       }
     },
-    { immediate: false }
+    { immediate: true }
   );
 };

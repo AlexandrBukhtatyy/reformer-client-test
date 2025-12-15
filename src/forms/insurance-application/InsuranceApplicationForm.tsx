@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createForm, validateForm } from '@reformer/core';
 import type { ValidationSchemaFn } from '@reformer/core';
 import type { InsuranceApplicationForm as IInsuranceApplicationForm } from './type';
 import { insuranceApplicationSchema } from './schema';
 import { insuranceApplicationBehaviors } from './behaviors';
 import { STEP_VALIDATIONS, fullValidation } from './validators';
+import { fetchApplicationData, populateForm } from './mock-data';
 
 import { InsuranceTypeStep } from './steps/insurance-type/InsuranceTypeStep';
 import { InsuredPartyStep } from './steps/insured-party/InsuredPartyStep';
@@ -33,8 +34,28 @@ const form = createForm<IInsuranceApplicationForm>({
 export function InsuranceApplicationForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const totalSteps = 6;
+
+  // Загрузка начальных данных при инициализации
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        console.log('Loading initial form data...');
+        const data = await fetchApplicationData();
+        console.log('Received data:', data);
+        populateForm(form, data);
+        console.log('Form populated successfully');
+      } catch (error) {
+        console.error('Failed to load initial data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadInitialData();
+  }, []);
 
   const goToNextStep = async () => {
     const validation = STEP_VALIDATIONS[currentStep] as ValidationSchemaFn<IInsuranceApplicationForm>;
@@ -125,6 +146,17 @@ export function InsuranceApplicationForm() {
         return null;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Загрузка данных заявки...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

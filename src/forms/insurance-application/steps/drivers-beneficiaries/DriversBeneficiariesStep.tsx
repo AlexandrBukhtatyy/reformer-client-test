@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { useFormControlValue } from '@reformer/core';
 import type { GroupNodeWithControls } from '@reformer/core';
 import { FormField } from '@/components/ui/FormField';
@@ -14,6 +15,10 @@ export function DriversBeneficiariesStep({ control }: DriversBeneficiariesStepPr
   const insuranceType = useFormControlValue(control.insuranceType);
   const unlimitedDrivers = useFormControlValue(control.unlimitedDrivers);
   const totalShare = useFormControlValue(control.totalBeneficiaryShare) as number | undefined;
+
+  // Force re-render when array items are added/removed
+  const [, forceUpdate] = useState(0);
+  const triggerUpdate = useCallback(() => forceUpdate((n) => n + 1), []);
 
   const isVehicleInsurance = insuranceType === 'casco' || insuranceType === 'osago';
   const isLifeInsurance = insuranceType === 'life';
@@ -33,7 +38,10 @@ export function DriversBeneficiariesStep({ control }: DriversBeneficiariesStepPr
                   <DriverItem
                     key={index}
                     control={driver}
-                    onRemove={() => control.drivers.removeAt(index)}
+                    onRemove={() => {
+                      control.drivers.removeAt(index);
+                      triggerUpdate();
+                    }}
                     index={index}
                   />
                 ))}
@@ -42,7 +50,7 @@ export function DriversBeneficiariesStep({ control }: DriversBeneficiariesStepPr
               <Button
                 type="button"
                 variant="outline"
-                onClick={() =>
+                onClick={() => {
                   control.drivers.push({
                     lastName: '',
                     firstName: '',
@@ -52,8 +60,9 @@ export function DriversBeneficiariesStep({ control }: DriversBeneficiariesStepPr
                     licenseNumber: '',
                     licenseIssueDate: '',
                     experience: undefined,
-                  })
-                }
+                  });
+                  triggerUpdate();
+                }}
               >
                 Добавить водителя
               </Button>
@@ -76,7 +85,10 @@ export function DriversBeneficiariesStep({ control }: DriversBeneficiariesStepPr
               <BeneficiaryItem
                 key={index}
                 control={beneficiary}
-                onRemove={() => control.beneficiaries.removeAt(index)}
+                onRemove={() => {
+                  control.beneficiaries.removeAt(index);
+                  triggerUpdate();
+                }}
                 index={index}
               />
             ))}
@@ -85,7 +97,7 @@ export function DriversBeneficiariesStep({ control }: DriversBeneficiariesStepPr
           <Button
             type="button"
             variant="outline"
-            onClick={() =>
+            onClick={() => {
               control.beneficiaries.push({
                 lastName: '',
                 firstName: '',
@@ -96,8 +108,9 @@ export function DriversBeneficiariesStep({ control }: DriversBeneficiariesStepPr
                 passportSeries: '',
                 passportNumber: '',
                 phone: '',
-              })
-            }
+              });
+              triggerUpdate();
+            }}
           >
             Добавить выгодоприобретателя
           </Button>

@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { useFormControlValue } from '@reformer/core';
 import type { GroupNodeWithControls } from '@reformer/core';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,10 @@ interface InsuranceObjectStepProps {
 
 export function InsuranceObjectStep({ control }: InsuranceObjectStepProps) {
   const insuranceType = useFormControlValue(control.insuranceType);
+
+  // Force re-render when array items are added/removed
+  const [, forceUpdate] = useState(0);
+  const triggerUpdate = useCallback(() => forceUpdate((n) => n + 1), []);
 
   return (
     <div className="space-y-6">
@@ -43,7 +48,10 @@ export function InsuranceObjectStep({ control }: InsuranceObjectStepProps) {
                 <TravelerItem
                   key={index}
                   control={traveler}
-                  onRemove={() => control.travelers.removeAt(index)}
+                  onRemove={() => {
+                    control.travelers.removeAt(index);
+                    triggerUpdate();
+                  }}
                   index={index}
                 />
               ))}
@@ -52,7 +60,7 @@ export function InsuranceObjectStep({ control }: InsuranceObjectStepProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() =>
+              onClick={() => {
                 control.travelers.push({
                   lastName: '',
                   firstName: '',
@@ -61,8 +69,9 @@ export function InsuranceObjectStep({ control }: InsuranceObjectStepProps) {
                   passportNumber: '',
                   passportExpiry: '',
                   citizenship: 'RUS',
-                })
-              }
+                });
+                triggerUpdate();
+              }}
             >
               Добавить путешественника
             </Button>

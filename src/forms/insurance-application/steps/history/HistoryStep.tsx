@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { useFormControlValue } from '@reformer/core';
 import type { GroupNodeWithControls } from '@reformer/core';
 import { FormField } from '@/components/ui/FormField';
@@ -12,6 +13,10 @@ interface HistoryStepProps {
 export function HistoryStep({ control }: HistoryStepProps) {
   const hasPreviousInsurance = useFormControlValue(control.hasPreviousInsurance);
   const hasClaimsHistory = useFormControlValue(control.hasClaimsHistory);
+
+  // Force re-render when array items are added/removed
+  const [, forceUpdate] = useState(0);
+  const triggerUpdate = useCallback(() => forceUpdate((n) => n + 1), []);
 
   return (
     <div className="space-y-6">
@@ -40,7 +45,10 @@ export function HistoryStep({ control }: HistoryStepProps) {
               <ClaimItem
                 key={index}
                 control={claim}
-                onRemove={() => control.claims.removeAt(index)}
+                onRemove={() => {
+                  control.claims.removeAt(index);
+                  triggerUpdate();
+                }}
                 index={index}
               />
             ))}
@@ -48,7 +56,7 @@ export function HistoryStep({ control }: HistoryStepProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() =>
+              onClick={() => {
                 control.claims.push({
                   date: '',
                   claimType: 'accident',
@@ -56,8 +64,9 @@ export function HistoryStep({ control }: HistoryStepProps) {
                   amount: undefined,
                   wasCompensated: false,
                   compensationAmount: undefined,
-                })
-              }
+                });
+                triggerUpdate();
+              }}
             >
               Добавить страховой случай
             </Button>
