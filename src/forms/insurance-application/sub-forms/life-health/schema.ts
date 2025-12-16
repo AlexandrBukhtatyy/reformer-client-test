@@ -153,4 +153,54 @@ export const lifeHealthSchema: FormSchema<LifeHealthData> = {
       testId: 'lifeHealth-isHazardousWork',
     },
   },
+  practicesSports: {
+    value: false,
+    component: Checkbox,
+    componentProps: {
+      label: 'Занимаетесь спортом',
+      testId: 'lifeHealth-practicesSports',
+    },
+  },
+  extremeSports: {
+    value: false,
+    component: Checkbox,
+    componentProps: {
+      label: 'Экстремальные виды спорта',
+      testId: 'lifeHealth-extremeSports',
+    },
+  },
+  coverageOptions: {
+    death: {
+      value: true,
+      component: Checkbox,
+      componentProps: {
+        label: 'Смерть',
+        testId: 'lifeHealth-coverage-death',
+      },
+    },
+    disability: {
+      value: true,
+      component: Checkbox,
+      componentProps: {
+        label: 'Инвалидность',
+        testId: 'lifeHealth-coverage-disability',
+      },
+    },
+    criticalIllness: {
+      value: false,
+      component: Checkbox,
+      componentProps: {
+        label: 'Критические заболевания',
+        testId: 'lifeHealth-coverage-criticalIllness',
+      },
+    },
+    accident: {
+      value: true,
+      component: Checkbox,
+      componentProps: {
+        label: 'Несчастный случай',
+        testId: 'lifeHealth-coverage-accident',
+      },
+    },
+  },
 };

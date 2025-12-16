@@ -50,6 +50,8 @@ export async function fetchApplicationData(): Promise<Partial<InsuranceApplicati
       registrationCertificate: '99 00 123456',
       hasAntiTheft: true,
       antiTheftBrand: 'StarLine',
+      garageParking: true,
+      usagePurpose: 'personal',
     },
 
     // Шаг 4: Водители
@@ -64,6 +66,8 @@ export async function fetchApplicationData(): Promise<Partial<InsuranceApplicati
         licenseNumber: '77 00 123456',
         licenseIssueDate: '2005-08-10',
         experience: 19,
+        accidentsCount: 0,
+        isMainDriver: true,
       },
       {
         lastName: 'Иванова',
@@ -74,6 +78,8 @@ export async function fetchApplicationData(): Promise<Partial<InsuranceApplicati
         licenseNumber: '77 00 654321',
         licenseIssueDate: '2012-04-15',
         experience: 12,
+        accidentsCount: 1,
+        isMainDriver: false,
       },
     ],
 

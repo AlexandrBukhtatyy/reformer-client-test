@@ -5,6 +5,7 @@ export interface ClaimData {
   claimType: ClaimType;
   description: string;
   amount: number | undefined;
+  atFault: boolean; // Виновность страхователя в ДТП
   wasCompensated: boolean;
   compensationAmount: number | undefined;
 }

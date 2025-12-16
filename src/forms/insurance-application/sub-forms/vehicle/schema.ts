@@ -8,6 +8,7 @@ import {
   CAR_BRAND_OPTIONS,
   BODY_TYPE_OPTIONS,
   TRANSMISSION_OPTIONS,
+  USAGE_PURPOSE_OPTIONS,
 } from '../../constants';
 
 export const vehicleSchema: FormSchema<VehicleData> = {
@@ -138,6 +139,24 @@ export const vehicleSchema: FormSchema<VehicleData> = {
       label: 'Марка противоугонной системы',
       placeholder: 'StarLine, Pandora...',
       testId: 'vehicle-antiTheftBrand',
+    },
+  },
+  garageParking: {
+    value: false,
+    component: Checkbox,
+    componentProps: {
+      label: 'Гаражное хранение',
+      testId: 'vehicle-garageParking',
+    },
+  },
+  usagePurpose: {
+    value: 'personal',
+    component: Select,
+    componentProps: {
+      label: 'Цель использования',
+      placeholder: 'Выберите цель',
+      options: USAGE_PURPOSE_OPTIONS,
+      testId: 'vehicle-usagePurpose',
     },
   },
 };

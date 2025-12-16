@@ -136,6 +136,14 @@ export const TRANSMISSION_OPTIONS = [
   { value: 'automatic', label: 'Автомат' },
 ] as const;
 
+// Цель использования ТС
+export const USAGE_PURPOSE_OPTIONS = [
+  { value: 'personal', label: 'Личное использование' },
+  { value: 'taxi', label: 'Такси' },
+  { value: 'learning', label: 'Учебная езда' },
+  { value: 'other', label: 'Другое' },
+] as const;
+
 // Тип недвижимости
 export const PROPERTY_TYPE_OPTIONS = [
   { value: 'apartment', label: 'Квартира' },
@@ -163,19 +171,13 @@ export const TRAVEL_PURPOSE_OPTIONS = [
   { value: 'sport', label: 'Спорт' },
 ] as const;
 
-// Страны для путешествий
-export const COUNTRY_OPTIONS = [
-  { value: 'schengen', label: 'Шенген (все страны)', group: 'Европа' },
-  { value: 'germany', label: 'Германия', group: 'Европа' },
-  { value: 'france', label: 'Франция', group: 'Европа' },
-  { value: 'italy', label: 'Италия', group: 'Европа' },
-  { value: 'spain', label: 'Испания', group: 'Европа' },
-  { value: 'turkey', label: 'Турция', group: 'Азия' },
-  { value: 'thailand', label: 'Таиланд', group: 'Азия' },
-  { value: 'uae', label: 'ОАЭ', group: 'Азия' },
-  { value: 'egypt', label: 'Египет', group: 'Африка' },
-  { value: 'usa', label: 'США', group: 'Америка' },
-  { value: 'worldwide', label: 'Весь мир', group: 'Мультистрана' },
+// Регионы для путешествий
+export const DESTINATION_OPTIONS = [
+  { value: 'europe', label: 'Европа' },
+  { value: 'asia', label: 'Азия' },
+  { value: 'america', label: 'Америка' },
+  { value: 'africa', label: 'Африка' },
+  { value: 'worldwide', label: 'Весь мир' },
 ] as const;
 
 // Виды спорта

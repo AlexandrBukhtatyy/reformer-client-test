@@ -1,3 +1,10 @@
+export interface LifeCoverageOptions {
+  death: boolean;           // Смерть
+  disability: boolean;      // Инвалидность
+  criticalIllness: boolean; // Критические заболевания
+  accident: boolean;        // Несчастный случай
+}
+
 export interface LifeHealthData {
   height: number | undefined;
   weight: number | undefined;
@@ -14,4 +21,7 @@ export interface LifeHealthData {
   surgeriesDescription: string;
   occupation: string;
   isHazardousWork: boolean;
+  practicesSports: boolean;
+  extremeSports: boolean;
+  coverageOptions: LifeCoverageOptions;
 }

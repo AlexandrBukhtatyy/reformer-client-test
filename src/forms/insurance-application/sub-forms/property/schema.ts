@@ -17,12 +17,50 @@ export const propertySchema: FormSchema<PropertyData> = {
     },
   },
   address: {
-    value: '',
-    component: Input,
-    componentProps: {
-      label: 'Адрес объекта',
-      placeholder: 'г. Москва, ул. Примерная, д. 1, кв. 1',
-      testId: 'property-address',
+    region: {
+      value: '',
+      component: Input,
+      componentProps: {
+        label: 'Регион',
+        placeholder: 'Московская область',
+        testId: 'property-address-region',
+      },
+    },
+    city: {
+      value: '',
+      component: Input,
+      componentProps: {
+        label: 'Город',
+        placeholder: 'Москва',
+        testId: 'property-address-city',
+      },
+    },
+    street: {
+      value: '',
+      component: Input,
+      componentProps: {
+        label: 'Улица',
+        placeholder: 'ул. Примерная',
+        testId: 'property-address-street',
+      },
+    },
+    house: {
+      value: '',
+      component: Input,
+      componentProps: {
+        label: 'Дом',
+        placeholder: '1',
+        testId: 'property-address-house',
+      },
+    },
+    apartment: {
+      value: '',
+      component: Input,
+      componentProps: {
+        label: 'Квартира',
+        placeholder: '1',
+        testId: 'property-address-apartment',
+      },
     },
   },
   area: {
@@ -121,6 +159,57 @@ export const propertySchema: FormSchema<PropertyData> = {
     componentProps: {
       label: 'Сдается в аренду',
       testId: 'property-isRented',
+    },
+  },
+  hasFireAlarm: {
+    value: false,
+    component: Checkbox,
+    componentProps: {
+      label: 'Есть пожарная сигнализация',
+      testId: 'property-hasFireAlarm',
+    },
+  },
+  ownershipDoc: {
+    value: '',
+    component: Input,
+    componentProps: {
+      label: 'Номер документа о собственности',
+      placeholder: '77-77/001-77/001/001/2020-1234',
+      testId: 'property-ownershipDoc',
+    },
+  },
+  coverageOptions: {
+    structure: {
+      value: true,
+      component: Checkbox,
+      componentProps: {
+        label: 'Конструктивные элементы',
+        testId: 'property-coverage-structure',
+      },
+    },
+    interior: {
+      value: true,
+      component: Checkbox,
+      componentProps: {
+        label: 'Внутренняя отделка',
+        testId: 'property-coverage-interior',
+      },
+    },
+    movables: {
+      value: false,
+      component: Checkbox,
+      componentProps: {
+        label: 'Движимое имущество',
+        testId: 'property-coverage-movables',
+      },
+    },
+    liability: {
+      value: false,
+      component: Checkbox,
+      componentProps: {
+        label: 'Гражданская ответственность',
+        testId: 'property-coverage-liability',
+      },
     },
   },
 };

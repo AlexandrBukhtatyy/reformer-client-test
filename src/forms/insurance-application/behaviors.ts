@@ -7,6 +7,31 @@ import { insuranceObjectBehaviors } from './steps/insurance-object/behaviors';
 import { historyBehaviors } from './steps/history/behaviors';
 import { PREMIUM_COEFFICIENTS } from './constants';
 
+// Хелпер для расчёта базовой премии
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const calculateBasePremium = (form: any): number => {
+  const insuranceType = form?.insuranceType?.value?.value;
+  const coverageAmount = form?.coverageAmount?.value?.value ?? 0;
+  const vehicleMarketValue = form?.vehicle?.marketValue?.value?.value ?? 0;
+  const propertyMarketValue = form?.property?.marketValue?.value?.value ?? 0;
+  const tripDuration = form?.travel?.tripDuration?.value?.value ?? 7;
+
+  switch (insuranceType) {
+    case 'casco':
+      return vehicleMarketValue * PREMIUM_COEFFICIENTS.baseTariffs.casco;
+    case 'osago':
+      return PREMIUM_COEFFICIENTS.baseTariffs.osago;
+    case 'property':
+      return propertyMarketValue * PREMIUM_COEFFICIENTS.baseTariffs.property;
+    case 'life':
+      return coverageAmount * PREMIUM_COEFFICIENTS.baseTariffs.life;
+    case 'travel':
+      return tripDuration * PREMIUM_COEFFICIENTS.baseTariffs.travel * 90; // USD to RUB
+    default:
+      return coverageAmount * 0.01;
+  }
+};
+
 export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicationForm> = (path) => {
   // Behaviors для шагов
   insuranceTypeBehaviors(path);
@@ -15,40 +40,41 @@ export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicatio
   historyBehaviors(path);
 
   // Cross-step behaviors: вычисление премии
-  // Вычисление базовой премии
+  // Вычисление базовой премии при изменении типа страхования
   watchField(
     path.insuranceType,
-    (insuranceType, ctx) => {
+    (_, ctx) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const form = ctx.form as any;
-      const coverageAmount = form?.coverageAmount?.value ?? 0;
-      const vehicleMarketValue = form?.vehicle?.marketValue?.value ?? 0;
-      const propertyMarketValue = form?.property?.marketValue?.value ?? 0;
+      ctx.setFieldValue('basePremium', Math.round(calculateBasePremium(form)));
+    },
+    { immediate: false, debounce: 300 }
+  );
 
-      let basePremium = 0;
-
-      switch (insuranceType) {
-        case 'casco':
-          basePremium = vehicleMarketValue * PREMIUM_COEFFICIENTS.baseTariffs.casco;
-          break;
-        case 'osago':
-          basePremium = PREMIUM_COEFFICIENTS.baseTariffs.osago;
-          break;
-        case 'property':
-          basePremium = propertyMarketValue * PREMIUM_COEFFICIENTS.baseTariffs.property;
-          break;
-        case 'life':
-          basePremium = coverageAmount * PREMIUM_COEFFICIENTS.baseTariffs.life;
-          break;
-        case 'travel':
-          const tripDuration = form?.travel?.tripDuration?.value ?? 7;
-          basePremium = tripDuration * PREMIUM_COEFFICIENTS.baseTariffs.travel * 90; // USD to RUB
-          break;
-        default:
-          basePremium = coverageAmount * 0.01;
+  // Пересчёт базовой премии при изменении рыночной стоимости автомобиля (для КАСКО)
+  watchField(
+    path.vehicle.marketValue,
+    (_, ctx) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const form = ctx.form as any;
+      // Пересчитываем только если тип страхования - КАСКО
+      if (form?.insuranceType?.value?.value === 'casco') {
+        ctx.setFieldValue('basePremium', Math.round(calculateBasePremium(form)));
       }
+    },
+    { immediate: false, debounce: 300 }
+  );
 
-      ctx.setFieldValue('basePremium', Math.round(basePremium));
+  // Пересчёт базовой премии при изменении страховой суммы (для жизни и default)
+  watchField(
+    path.coverageAmount,
+    (_, ctx) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const form = ctx.form as any;
+      const insuranceType = form?.insuranceType?.value?.value;
+      if (insuranceType === 'life' || !['casco', 'osago', 'property', 'travel'].includes(insuranceType)) {
+        ctx.setFieldValue('basePremium', Math.round(calculateBasePremium(form)));
+      }
     },
     { immediate: false, debounce: 300 }
   );
@@ -149,12 +175,13 @@ export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicatio
     (basePremium, ctx) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const form = ctx.form as any;
-      const ageCoeff = form?.ageCoefficient?.value ?? 1;
-      const expCoeff = form?.experienceCoefficient?.value ?? 1;
-      const regCoeff = form?.regionalCoefficient?.value ?? 1;
-      const kbmCoeff = form?.kbmCoefficient?.value ?? 1;
-      const deductDiscount = form?.deductibleDiscount?.value ?? 0;
-      const promoDiscount = form?.promoDiscount?.value ?? 0;
+      // Правильный доступ: .value.value
+      const ageCoeff = form?.ageCoefficient?.value?.value ?? 1;
+      const expCoeff = form?.experienceCoefficient?.value?.value ?? 1;
+      const regCoeff = form?.regionalCoefficient?.value?.value ?? 1;
+      const kbmCoeff = form?.kbmCoefficient?.value?.value ?? 1;
+      const deductDiscount = form?.deductibleDiscount?.value?.value ?? 0;
+      const promoDiscount = form?.promoDiscount?.value?.value ?? 0;
 
       const premium = basePremium || 0;
       const total =
@@ -171,8 +198,9 @@ export const insuranceApplicationBehaviors: BehaviorSchemaFn<InsuranceApplicatio
     (totalPremium, ctx) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const form = ctx.form as any;
-      const paymentType = form?.paymentType?.value;
-      const installments = form?.installments?.value;
+      // Правильный доступ: .value.value
+      const paymentType = form?.paymentType?.value?.value;
+      const installments = form?.installments?.value?.value;
 
       if (paymentType === 'installments' && installments && totalPremium) {
         const installmentAmount =

@@ -4,17 +4,17 @@ import { Select } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import type { TravelData } from './type';
-import { COUNTRY_OPTIONS, TRAVEL_PURPOSE_OPTIONS, SPORT_TYPE_OPTIONS } from '../../constants';
+import { DESTINATION_OPTIONS, TRAVEL_PURPOSE_OPTIONS, SPORT_TYPE_OPTIONS } from '../../constants';
 
 export const travelSchema: FormSchema<TravelData> = {
-  countries: {
-    value: [],
+  destination: {
+    value: 'europe',
     component: Select,
     componentProps: {
-      label: 'Страны назначения',
-      placeholder: 'Выберите страну',
-      options: COUNTRY_OPTIONS,
-      testId: 'travel-countries',
+      label: 'Страна/регион назначения',
+      placeholder: 'Выберите регион',
+      options: DESTINATION_OPTIONS,
+      testId: 'travel-destination',
     },
   },
   departureDate: {
@@ -116,6 +116,56 @@ export const travelSchema: FormSchema<TravelData> = {
     componentProps: {
       label: 'Включить гражданскую ответственность',
       testId: 'travel-includesLiability',
+    },
+  },
+  isMultipleTrips: {
+    value: false,
+    component: Checkbox,
+    componentProps: {
+      label: 'Мультипоездка (несколько поездок в год)',
+      testId: 'travel-isMultipleTrips',
+    },
+  },
+  coverageOptions: {
+    medical: {
+      value: true,
+      component: Checkbox,
+      componentProps: {
+        label: 'Медицинские расходы',
+        testId: 'travel-coverage-medical',
+      },
+    },
+    baggage: {
+      value: false,
+      component: Checkbox,
+      componentProps: {
+        label: 'Багаж',
+        testId: 'travel-coverage-baggage',
+      },
+    },
+    tripCancellation: {
+      value: false,
+      component: Checkbox,
+      componentProps: {
+        label: 'Отмена поездки',
+        testId: 'travel-coverage-tripCancellation',
+      },
+    },
+    flightDelay: {
+      value: false,
+      component: Checkbox,
+      componentProps: {
+        label: 'Задержка рейса',
+        testId: 'travel-coverage-flightDelay',
+      },
+    },
+    carRental: {
+      value: false,
+      component: Checkbox,
+      componentProps: {
+        label: 'Аренда авто',
+        testId: 'travel-coverage-carRental',
+      },
     },
   },
 };

@@ -47,6 +47,14 @@ export const claimSchema: FormSchema<ClaimData> = {
       testId: 'claim-amount',
     },
   },
+  atFault: {
+    value: false,
+    component: Checkbox,
+    componentProps: {
+      label: 'Страхователь был виновником',
+      testId: 'claim-atFault',
+    },
+  },
   wasCompensated: {
     value: false,
     component: Checkbox,

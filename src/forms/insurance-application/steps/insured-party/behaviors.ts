@@ -4,15 +4,18 @@ import type { InsuredPartyStep } from './type';
 
 export const insuredPartyBehaviors: BehaviorSchemaFn<InsuredPartyStep> = (path) => {
   // Вычисление полного имени
+  // ctx.form при наблюдении path.personalData.lastName — это PersonalData (родитель lastName)
   watchField(
     path.personalData.lastName,
     (lastName, ctx) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const form = ctx.form as any;
-      const firstName = form?.personalData?.firstName?.value ?? '';
-      const middleName = form?.personalData?.middleName?.value ?? '';
+      // firstName и middleName — siblings в PersonalData
+      const firstName = form?.firstName?.value?.value ?? '';
+      const middleName = form?.middleName?.value?.value ?? '';
       const fullName = [lastName, firstName, middleName].filter(Boolean).join(' ');
-      ctx.setFieldValue('personalData.fullName', fullName);
+      // fullName находится на корневом уровне InsuredPartyStep (а значит и всей формы)
+      ctx.setFieldValue('fullName', fullName);
     },
     { immediate: false }
   );
@@ -22,10 +25,10 @@ export const insuredPartyBehaviors: BehaviorSchemaFn<InsuredPartyStep> = (path) 
     (firstName, ctx) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const form = ctx.form as any;
-      const lastName = form?.personalData?.lastName?.value ?? '';
-      const middleName = form?.personalData?.middleName?.value ?? '';
+      const lastName = form?.lastName?.value?.value ?? '';
+      const middleName = form?.middleName?.value?.value ?? '';
       const fullName = [lastName, firstName, middleName].filter(Boolean).join(' ');
-      ctx.setFieldValue('personalData.fullName', fullName);
+      ctx.setFieldValue('fullName', fullName);
     },
     { immediate: false }
   );
@@ -35,10 +38,10 @@ export const insuredPartyBehaviors: BehaviorSchemaFn<InsuredPartyStep> = (path) 
     (middleName, ctx) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const form = ctx.form as any;
-      const lastName = form?.personalData?.lastName?.value ?? '';
-      const firstName = form?.personalData?.firstName?.value ?? '';
+      const lastName = form?.lastName?.value?.value ?? '';
+      const firstName = form?.firstName?.value?.value ?? '';
       const fullName = [lastName, firstName, middleName].filter(Boolean).join(' ');
-      ctx.setFieldValue('personalData.fullName', fullName);
+      ctx.setFieldValue('fullName', fullName);
     },
     { immediate: false }
   );
@@ -55,9 +58,10 @@ export const insuredPartyBehaviors: BehaviorSchemaFn<InsuredPartyStep> = (path) 
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
           age--;
         }
-        ctx.setFieldValue('personalData.age', age > 0 ? age : undefined);
+        // age находится на корневом уровне формы
+        ctx.setFieldValue('age', age > 0 ? age : undefined);
       } else {
-        ctx.setFieldValue('personalData.age', undefined);
+        ctx.setFieldValue('age', undefined);
       }
     },
     { immediate: false }

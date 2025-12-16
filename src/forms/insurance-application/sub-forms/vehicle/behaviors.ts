@@ -24,6 +24,6 @@ export const vehicleBehaviors: BehaviorSchemaFn<VehicleData> = (path) => {
         ctx.setFieldValue('model', '');
       }
     },
-    { immediate: true }
+    { immediate: false }
   );
 };

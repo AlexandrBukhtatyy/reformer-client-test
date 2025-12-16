@@ -7,4 +7,6 @@ export interface DriverData {
   licenseNumber: string;
   licenseIssueDate: string;
   experience: number | undefined; // computed: years since licenseIssueDate
+  accidentsCount: number | undefined;
+  isMainDriver: boolean;
 }
