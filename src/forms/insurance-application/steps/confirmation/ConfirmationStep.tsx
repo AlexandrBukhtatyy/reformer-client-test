@@ -37,34 +37,13 @@ export function ConfirmationStep({ control }: ConfirmationStepProps) {
         <h3 className="text-lg font-medium">Расчет стоимости полиса</h3>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Базовая премия:</span>
-            <FormField control={control.basePremium} className="w-32" />
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Коэф. возраста:</span>
-            <FormField control={control.ageCoefficient} className="w-32" />
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Коэф. стажа:</span>
-            <FormField control={control.experienceCoefficient} className="w-32" />
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Региональный коэф.:</span>
-            <FormField control={control.regionalCoefficient} className="w-32" />
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">КБМ:</span>
-            <FormField control={control.kbmCoefficient} className="w-32" />
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Скидка франшиза:</span>
-            <FormField control={control.deductibleDiscount} className="w-32" />
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Скидка промокод:</span>
-            <FormField control={control.promoDiscount} className="w-32" />
-          </div>
+            <FormField control={control.basePremium} />
+            <FormField control={control.ageCoefficient} />
+            <FormField control={control.experienceCoefficient} />
+            <FormField control={control.regionalCoefficient} />
+            <FormField control={control.kbmCoefficient} />
+            <FormField control={control.deductibleDiscount} />
+            <FormField control={control.promoDiscount} />
         </div>
 
         <div className="border-t pt-4 mt-4">
