@@ -12,7 +12,19 @@ export function PropertyFields({ control }: PropertyFieldsProps) {
       <h3 className="text-lg font-medium">Данные объекта недвижимости</h3>
 
       <FormField control={control.propertyType} />
-      <FormField control={control.address} />
+
+      <div className="space-y-4">
+        <h4 className="font-medium">Адрес</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField control={control.address.region} />
+          <FormField control={control.address.city} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FormField control={control.address.street} />
+          <FormField control={control.address.house} />
+          <FormField control={control.address.apartment} />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField control={control.area} />

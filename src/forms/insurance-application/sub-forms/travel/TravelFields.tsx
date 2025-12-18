@@ -15,7 +15,7 @@ export function TravelFields({ control }: TravelFieldsProps) {
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Данные о путешествии</h3>
 
-      <FormField control={control.countries} />
+      <FormField control={control.destination} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField control={control.departureDate} />
