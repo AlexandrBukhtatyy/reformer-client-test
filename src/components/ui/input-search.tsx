@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { SearchIcon, XIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { ResourceConfig, ResourceItem } from '@reformer/core';
+import type { ResourceConfig, ResourceItem } from '@reformer/ui-kit/select';
 
 export interface InputSearchProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'resource'> {
@@ -152,7 +152,7 @@ const InputSearch = React.forwardRef<HTMLInputElement, InputSearchProps>(
                 }}
               >
                 <div className="font-medium">{suggestion.label}</div>
-                {suggestion.description && (
+                {typeof suggestion.description === 'string' && (
                   <div className="text-xs text-gray-500">{suggestion.description}</div>
                 )}
               </div>
