@@ -25,7 +25,13 @@ dist-ssr
 
 # Playwright
 /test-results/
+/test-videos/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Beads: local Dolt DB + locks are machine-local; commit only the .jsonl export
+.beads/dolt/
+.beads/*.lock
+.beads/.local_version
