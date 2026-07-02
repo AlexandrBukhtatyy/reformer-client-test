@@ -1,7 +1,12 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__reformer-*"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "reformer-mcp",
     "playwright"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
