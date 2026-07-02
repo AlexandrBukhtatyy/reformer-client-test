@@ -14,6 +14,8 @@ const FormFieldComponent: React.FC<FormFieldProps> = ({ control, className, test
     useFormControl(control);
 
   const Component = control.component;
+  if (!Component) return null;
+
   const isCheckbox = control.component === Checkbox;
   const safeValue = value ?? (isCheckbox ? false : '');
 
